@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Python Pocket Marcos</title>
+<style>
+:root{--bg:#050b18;--card:#101b2e;--card2:#050b18;--txt:#f8fafc;--mut:#9fb0c7;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--gray:#334155;--bd:rgba(255,255,255,.13)}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,rgba(37,99,235,.28),transparent 38%),var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif}.app{max-width:920px;margin:auto;padding:14px;padding-bottom:30px}.card{background:rgba(16,27,46,.95);border:1px solid var(--bd);border-radius:22px;padding:16px;box-shadow:0 18px 55px rgba(0,0,0,.35);margin-bottom:12px}h1{margin:0 0 6px;font-size:28px}.sub{color:var(--mut);line-height:1.4;margin:0}.pill{display:inline-block;margin-top:10px;padding:7px 10px;border-radius:999px;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.38);color:#bbf7d0;font-size:13px;font-weight:900}textarea{width:100%;min-height:260px;border:1px solid var(--bd);border-radius:16px;background:var(--card2);color:var(--txt);padding:14px;font-size:14px;line-height:1.45;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}button{width:100%;border:0;border-radius:15px;color:#fff;background:var(--gray);padding:13px 10px;font-size:15px;font-weight:900;margin-top:8px}.green{background:var(--green)}.blue{background:var(--blue)}.red{background:var(--red)}.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.out{white-space:pre-wrap;background:#020817;border:1px solid var(--bd);border-radius:16px;padding:14px;min-height:180px;color:#dbeafe;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.45}.status{font-size:13px;color:#a7f3d0;margin-top:8px;white-space:pre-wrap}@media(max-width:680px){.grid{grid-template-columns:1fr}textarea{min-height:230px}h1{font-size:25px}}
+</style>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.29.4/full/pyodide.js"></script>
+</head>
+<body>
+<main class="app">
+<section class="card"><h1>Python Pocket Marcos</h1><p class="sub">Ejecutá Python dentro del navegador con Pyodide. No usa servidor, Netlify ni API.</p><span class="pill" id="pill">Cargando Python...</span><div class="status" id="status"></div></section>
+<section class="card"><textarea id="code"># Python en Pocket / Safari
+print('Hola Marcos')
+
+# Ejemplo traumatología educativo
+varo_valgo = 6
+hka = 180 + varo_valgo
+gap_conceptual = abs(varo_valgo) * 0.7
+
+print('HKA conceptual:', hka, 'grados')
+print('Gap conceptual:', round(gap_conceptual, 1), 'mm')
+
+for paso in ['incisión', 'exposición', 'resección', 'prueba', 'implante']:
+    print('Paso:', paso)</textarea><div class="grid"><button class="green" onclick="runCode()">▶ Ejecutar Python</button><button class="blue" onclick="loadExample()">Ejemplo ATR</button><button class="red" onclick="clearOutput()">Limpiar salida</button></div></section>
+<section class="card"><h2>Salida</h2><div id="output" class="out">Esperando Python...</div></section>
+</main>
+<script>
+let pyodide=null;const $=id=>document.getElementById(id);async function init(){try{$('status').textContent='Descargando runtime de Python. La primera vez puede tardar...';pyodide=await loadPyodide();$('pill').textContent='Python listo';$('status').textContent='Listo. Tocá Ejecutar Python.';$('output').textContent='Python cargado correctamente.'}catch(e){$('pill').textContent='Error';$('status').textContent='No pudo cargar Pyodide. Revisá internet o abrí en Safari/Chrome moderno.\n'+e.message;$('output').textContent=e.stack||e.message}}async function runCode(){if(!pyodide){$('output').textContent='Python todavía está cargando...';return}const userCode=$('code').value;const wrapped=`
+import sys, io, traceback
+_buf = io.StringIO()
+_oldout, _olderr = sys.stdout, sys.stderr
+sys.stdout = _buf
+sys.stderr = _buf
+try:
+    exec(${JSON.stringify(userCode)})
+except Exception:
+    traceback.print_exc()
+finally:
+    sys.stdout = _oldout
+    sys.stderr = _olderr
+_result = _buf.getvalue()
+_result
+`;try{$('output').textContent='Ejecutando...';const result=await pyodide.runPythonAsync(wrapped);$('output').textContent=result||'(sin salida)'}catch(e){$('output').textContent=e.stack||e.message}}function clearOutput(){$('output').textContent=''}function loadExample(){$('code').value=`# Calculadora educativa ATR
+# No usar para decisiones clínicas reales
+
+lado = 'Derecha'
+diagnostico = 'Gonartrosis primaria'
+varo_valgo = -8   # negativo = varo conceptual, positivo = valgo conceptual
+slope = 3
+rom_preop = '5-105'
+
+hka = 180 + varo_valgo
+gap = abs(varo_valgo) * 0.7
+
+print('PLAN EDUCATIVO ATR')
+print('Lado:', lado)
+print('Dx:', diagnostico)
+print('ROM preop:', rom_preop)
+print('HKA conceptual:', hka, 'grados')
+print('Slope conceptual:', slope, 'grados')
+print('Gap conceptual:', round(gap, 1), 'mm')
+
+if abs(varo_valgo) > 10:
+    print('Alerta educativa: deformidad importante, revisar balance y restricción.')
+else:
+    print('Deformidad conceptual moderada.')
+
+pasos = [
+    '1. Marcación e incisión',
+    '2. Exposición',
+    '3. Preparación ósea',
+    '4. Balance de gaps',
+    '5. Prueba de componentes',
+    '6. Implante definitivo'
+]
+
+for p in pasos:
+    print(p)
+`}
+init();
+</script>
+</body></html>
