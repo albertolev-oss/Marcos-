@@ -3,66 +3,179 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Rodilla 3D Marcos</title>
+  <meta name="theme-color" content="#07111f" />
+  <title>Rodilla 3D Marcos Pro</title>
+
   <style>
-    :root{--bg:#07111f;--panel:rgba(10,18,32,.88);--text:#f8fafc;--muted:#a7b3c8;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--gray:#334155;--border:rgba(255,255,255,.14)}
+    :root{
+      --bg:#07111f;--panel:rgba(8,15,28,.90);--panel2:rgba(15,23,42,.95);
+      --text:#f8fafc;--muted:#9fb0c7;--blue:#2563eb;--green:#16a34a;--red:#dc2626;
+      --orange:#ea580c;--gray:#334155;--border:rgba(255,255,255,.14);--yellow:#facc15;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;overscroll-behavior:none;touch-action:none}
     #viewer{position:fixed;inset:0;width:100vw;height:100vh;display:block}
-    .panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:12px;box-shadow:0 10px 40px rgba(0,0,0,.35);backdrop-filter:blur(10px)}
-    #topbar{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:10;padding:10px;pointer-events:none}#topbar .panel{pointer-events:auto}
-    .title{font-weight:900;font-size:17px;margin-bottom:3px}.subtitle{color:var(--muted);font-size:12px;line-height:1.25}#diag{margin-top:8px;color:#a7f3d0;font-size:12px;line-height:1.3;white-space:pre-wrap}
-    #controls{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:20;background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:10px;box-shadow:0 14px 45px rgba(0,0,0,.4);backdrop-filter:blur(10px)}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{border:0;border-radius:14px;padding:11px 8px;color:white;background:var(--gray);font-weight:800;font-size:13px;min-height:44px}button:active{transform:scale(.98)}.blue{background:var(--blue)}.green{background:var(--green)}.red{background:var(--red)}
-    #info{position:fixed;top:105px;left:10px;width:min(360px,calc(100vw - 20px));z-index:15;display:none}#info.open{display:block}#info h3{margin:0 0 8px;font-size:16px}#info p,#info li{color:#dbe7f5;font-size:13px;line-height:1.35}
-    #label{position:fixed;z-index:30;display:none;transform:translate(-50%,-120%);background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.2);color:white;padding:7px 9px;border-radius:10px;font-size:12px;pointer-events:none;max-width:190px;text-align:center}
-    @media(max-width:430px){.grid{grid-template-columns:repeat(2,1fr)}button{font-size:12px}}
+    .glass{background:var(--panel);border:1px solid var(--border);box-shadow:0 14px 45px rgba(0,0,0,.42);backdrop-filter:blur(12px)}
+    #topbar{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;z-index:20;padding:10px;pointer-events:none}
+    #topbar .box{border-radius:20px;padding:12px;pointer-events:auto}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .title{font-size:18px;font-weight:950;letter-spacing:-.02em}.sub{font-size:12px;color:var(--muted);line-height:1.25;margin-top:3px}
+    .pill{display:inline-flex;gap:6px;align-items:center;border:1px solid rgba(34,197,94,.35);background:rgba(22,163,74,.16);color:#bbf7d0;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900;white-space:nowrap}
+    #diag{font-size:11px;color:#a7f3d0;white-space:pre-wrap;line-height:1.25;margin-top:7px;display:none}#diag.open{display:block}
+    #controls{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0));z-index:30;border-radius:24px;padding:10px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    button{border:0;border-radius:15px;padding:11px 8px;color:white;background:var(--gray);font-weight:900;font-size:12px;min-height:42px;cursor:pointer}button:active{transform:scale(.98)}
+    .blue{background:var(--blue)}.green{background:var(--green)}.red{background:var(--red)}.orange{background:var(--orange)}
+    #sheet{position:fixed;right:10px;top:105px;width:min(380px,calc(100vw - 20px));max-height:calc(100vh - 235px);overflow:auto;z-index:25;border-radius:22px;padding:14px;display:none}#sheet.open{display:block}
+    #sheet h3{margin:0 0 8px;font-size:17px}#sheet p,#sheet li{font-size:13px;color:#dbe7f5;line-height:1.35}.section{border-top:1px solid var(--border);margin-top:12px;padding-top:12px}
+    label{font-size:12px;color:#cbd5e1;font-weight:900;display:flex;justify-content:space-between;margin:10px 0 6px}
+    input[type=range]{width:100%;accent-color:#60a5fa}.metric{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.metric div{background:rgba(2,6,23,.55);border:1px solid var(--border);border-radius:14px;padding:10px}.metric b{display:block;font-size:16px}.metric span{font-size:11px;color:var(--muted)}
+    #label{position:fixed;z-index:40;display:none;transform:translate(-50%,-124%);background:rgba(0,0,0,.82);border:1px solid rgba(255,255,255,.22);padding:8px 10px;border-radius:12px;font-size:12px;pointer-events:none;max-width:220px;text-align:center;line-height:1.25}
+    #toast{position:fixed;left:50%;bottom:calc(106px + env(safe-area-inset-bottom,0));transform:translateX(-50%);z-index:50;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:9px 14px;font-size:13px;display:none;white-space:nowrap}
+    @media(max-width:520px){.grid{grid-template-columns:repeat(3,1fr)}#sheet{top:114px;max-height:calc(100vh - 260px)}.title{font-size:16px}.pill{display:none}}
   </style>
-  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+
+  <script type="importmap">
+  {"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+  </script>
 </head>
 <body>
   <canvas id="viewer"></canvas>
-  <div id="topbar"><div class="panel"><div class="title">Rodilla 3D educativa</div><div class="subtitle">Hosting GitHub · 1 dedo rota · 2 dedos zoom/pan</div><div id="diag">Inicializando...</div></div></div>
+
+  <div id="topbar">
+    <div class="box glass">
+      <div class="row">
+        <div>
+          <div class="title">Rodilla 3D Marcos Pro</div>
+          <div class="sub">Educativa · GitHub Pages · táctil móvil · ATR conceptual</div>
+        </div>
+        <div class="pill">● online</div>
+      </div>
+      <div id="diag"></div>
+    </div>
+  </div>
+
   <div id="label"></div>
-  <div id="info" class="panel"><h3>Modelo educativo</h3><p>Rodilla 3D anatómica aproximada para docencia: fémur distal, tibia proximal, peroné, rótula, cartílago, meniscos, ligamentos, eje mecánico y prótesis simplificada.</p><ul><li>No es para planificación quirúrgica real.</li><li>Sirve para educación, prototipo y explicación al paciente.</li><li>Se puede reemplazar por un GLB anatómico segmentado.</li></ul></div>
-  <div id="controls"><div class="grid"><button class="blue" onclick="toggle('prosthesis')">Prótesis</button><button onclick="toggle('axis')">Eje</button><button onclick="toggle('cut')">Corte</button><button onclick="toggle('ligaments')">Ligamentos</button><button onclick="toggle('hotspots')">Hotspots</button><button onclick="toggleFlex()">Flex/ext</button><button onclick="view('front')">Frente</button><button onclick="view('lateral')">Lateral</button><button class="green" onclick="resetCamera()">Reset</button><button onclick="toggleInfo()">Info</button></div></div>
+  <div id="toast"></div>
+
+  <aside id="sheet" class="glass">
+    <h3>Panel quirúrgico educativo</h3>
+    <p>Modelo procedural para docencia. No reemplaza planificación quirúrgica, TC/Rx calibrada ni navegación.</p>
+
+    <div class="section">
+      <h3>Mediciones simuladas</h3>
+      <label>Varo / valgo <span id="valgusVal">0°</span></label>
+      <input id="valgus" type="range" min="-12" max="12" value="0" step="1" oninput="applySliders()">
+
+      <label>Slope tibial <span id="slopeVal">3°</span></label>
+      <input id="slope" type="range" min="-5" max="12" value="3" step="1" oninput="applySliders()">
+
+      <label>Tamaño implante <span id="sizeVal">100%</span></label>
+      <input id="size" type="range" min="80" max="125" value="100" step="5" oninput="applySliders()">
+
+      <label>Opacidad hueso <span id="opacityVal">100%</span></label>
+      <input id="opacity" type="range" min="25" max="100" value="100" step="5" oninput="applySliders()">
+
+      <div class="metric">
+        <div><b id="hka">180°</b><span>HKA simulado</span></div>
+        <div><b id="gap">0 mm</b><span>Gap conceptual</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Modos</h3>
+      <button class="blue" onclick="modePatient()">Modo paciente</button>
+      <button class="orange" onclick="modeSurgeon()">Modo cirujano</button>
+      <button onclick="toggleDiag()">Diagnóstico</button>
+      <button onclick="copyLink()">Copiar link</button>
+    </div>
+  </aside>
+
+  <div id="controls" class="glass">
+    <div class="grid">
+      <button class="blue" onclick="toggle('prosthesis')">Prótesis</button>
+      <button onclick="toggle('axis')">Eje</button>
+      <button onclick="toggle('cut')">Corte</button>
+      <button onclick="toggle('ligaments')">Lig.</button>
+      <button onclick="toggle('menisci')">Meniscos</button>
+      <button onclick="toggle('hotspots')">Puntos</button>
+      <button onclick="toggleFlex()">Flex/ext</button>
+      <button onclick="view('front')">Frente</button>
+      <button onclick="view('lateral')">Lateral</button>
+      <button onclick="view('axial')">Axial</button>
+      <button class="green" onclick="resetCamera()">Reset</button>
+      <button class="orange" onclick="toggleSheet()">Panel</button>
+    </div>
+  </div>
 
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    const diag=document.getElementById('diag');const label=document.getElementById('label');const canvas=document.getElementById('viewer');
+    const $=id=>document.getElementById(id);
+    const diag=$('diag'), label=$('label'), toast=$('toast'), canvas=$('viewer');
     const scene=new THREE.Scene();scene.background=new THREE.Color(0x07111f);
-    const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.01,100);camera.position.set(1.6,1.1,3.15);
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,.15,0);controls.minDistance=1.1;controls.maxDistance=7;
-    scene.add(new THREE.HemisphereLight(0xffffff,0x1e293b,2.2));const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(2.5,4,3);scene.add(key);const fill=new THREE.DirectionalLight(0x8ec5ff,.9);fill.position.set(-2,1,-2);scene.add(fill);
-    const grid=new THREE.GridHelper(3.4,24,0x36506d,0x1b2c44);grid.position.y=-1.72;scene.add(grid);
-    const state={prosthesis:true,axis:true,cut:false,ligaments:true,hotspots:true,flex:false,angle:0,dir:1};
-    const root=new THREE.Group();scene.add(root);const tibiaGroup=new THREE.Group();root.add(tibiaGroup);const prosthesis=new THREE.Group();root.add(prosthesis);const ligaments=new THREE.Group();root.add(ligaments);const hotspots=new THREE.Group();root.add(hotspots);
-    const boneMat=new THREE.MeshStandardMaterial({color:0xf0e4c8,roughness:.58});const cartMat=new THREE.MeshStandardMaterial({color:0xa9def5,roughness:.35,transparent:true,opacity:.72});const metalMat=new THREE.MeshStandardMaterial({color:0xcbd5e1,roughness:.22,metalness:.7});const polyMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.4});const ligMat=new THREE.MeshStandardMaterial({color:0xecaa69,roughness:.7});const menMat=new THREE.MeshStandardMaterial({color:0xf3f4f6,roughness:.45,transparent:true,opacity:.82});
-    function sphere(parent,name,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,48,28),mat);m.name=name;m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m}
-    function cyl(parent,name,p1,p2,r,mat){const a=new THREE.Vector3(...p1),b=new THREE.Vector3(...p2),mid=a.clone().add(b).multiplyScalar(.5),dir=b.clone().sub(a),len=dir.length();const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,32),mat);m.name=name;m.position.copy(mid);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());parent.add(m);return m}
-    function box(parent,name,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);m.name=name;m.position.set(x,y,z);parent.add(m);return m}
-    function torus(parent,name,x,y,z,maj,min,mat,scaleX=1,scaleZ=1){const m=new THREE.Mesh(new THREE.TorusGeometry(maj,min,20,80),mat);m.name=name;m.position.set(x,y,z);m.rotation.x=Math.PI/2;m.scale.set(scaleX,1,scaleZ);parent.add(m);return m}
+    const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.01,100);camera.position.set(1.65,1.15,3.2);
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,.15,0);controls.minDistance=1.05;controls.maxDistance=7;
 
-    cyl(root,'Fémur distal',[0,1.95,0],[0,.76,.02],.185,boneMat);sphere(root,'Metáfisis femoral',0,.70,.02,.35,.24,.30,boneMat);sphere(root,'Cóndilo medial',-.25,.43,.05,.32,.24,.36,boneMat);sphere(root,'Cóndilo lateral',.25,.43,.05,.32,.24,.36,boneMat);sphere(root,'Cartílago medial',-.25,.285,.05,.30,.055,.33,cartMat);sphere(root,'Cartílago lateral',.25,.285,.05,.30,.055,.33,cartMat);
-    cyl(tibiaGroup,'Tibia proximal',[0,-.20,0],[0,-1.65,0],.165,boneMat);sphere(tibiaGroup,'Meseta tibial',0,-.12,.02,.52,.19,.40,boneMat);sphere(tibiaGroup,'Cartílago tibial medial',-.22,.00,.02,.27,.055,.27,cartMat);sphere(tibiaGroup,'Cartílago tibial lateral',.22,.00,.02,.27,.055,.27,cartMat);cyl(tibiaGroup,'Peroné',[.46,-.22,-.04],[.47,-1.45,-.06],.062,boneMat);sphere(tibiaGroup,'Cabeza del peroné',.46,-.18,-.04,.12,.11,.10,boneMat);
-    torus(tibiaGroup,'Menisco medial',-.23,.055,.025,.19,.025,menMat,1.15,.85);torus(tibiaGroup,'Menisco lateral',.23,.055,.025,.17,.023,menMat,1.05,.95);
-    const patella=sphere(root,'Rótula',0,.46,.55,.20,.29,.075,boneMat);sphere(root,'Cartílago patelar',0,.42,.49,.16,.22,.025,cartMat);
+    scene.add(new THREE.HemisphereLight(0xffffff,0x1e293b,2.2));
+    const key=new THREE.DirectionalLight(0xffffff,2.25);key.position.set(2.5,4,3);scene.add(key);
+    const fill=new THREE.DirectionalLight(0x8ec5ff,.9);fill.position.set(-2,1,-2);scene.add(fill);
+    const grid=new THREE.GridHelper(3.5,24,0x36506d,0x1b2c44);grid.position.y=-1.72;scene.add(grid);
+
+    const state={prosthesis:true,axis:true,cut:false,ligaments:true,hotspots:true,menisci:true,flex:false,angle:0,dir:1};
+    const root=new THREE.Group();scene.add(root);
+    const femur=new THREE.Group(), tibia=new THREE.Group(), patellaGroup=new THREE.Group(), prosthesis=new THREE.Group(), ligaments=new THREE.Group(), menisci=new THREE.Group(), hotspots=new THREE.Group();
+    root.add(femur,tibia,patellaGroup,prosthesis,ligaments,menisci,hotspots);
+
+    const boneMat=new THREE.MeshStandardMaterial({color:0xf0e4c8,roughness:.58,transparent:true,opacity:1});
+    const boneMat2=new THREE.MeshStandardMaterial({color:0xdccfb3,roughness:.62,transparent:true,opacity:1});
+    const cartMat=new THREE.MeshStandardMaterial({color:0xa9def5,roughness:.35,transparent:true,opacity:.70});
+    const metalMat=new THREE.MeshStandardMaterial({color:0xcbd5e1,roughness:.22,metalness:.72});
+    const polyMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.4});
+    const ligMat=new THREE.MeshStandardMaterial({color:0xecaa69,roughness:.72});
+    const menMat=new THREE.MeshStandardMaterial({color:0xf3f4f6,roughness:.45,transparent:true,opacity:.82});
+    const hotMat=new THREE.MeshBasicMaterial({color:0xffd24b});
+    const boneMaterials=[boneMat,boneMat2,cartMat];
+
+    function sphere(parent,name,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,56,32),mat);m.name=name;m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m}
+    function cyl(parent,name,p1,p2,r,mat){const a=new THREE.Vector3(...p1),b=new THREE.Vector3(...p2),mid=a.clone().add(b).multiplyScalar(.5),dir=b.clone().sub(a),len=dir.length();const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,40),mat);m.name=name;m.position.copy(mid);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());parent.add(m);return m}
+    function box(parent,name,x,y,z,sx,sy,sz,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);m.name=name;m.position.set(x,y,z);parent.add(m);return m}
+    function torus(parent,name,x,y,z,maj,min,mat,scaleX=1,scaleZ=1){const m=new THREE.Mesh(new THREE.TorusGeometry(maj,min,20,96),mat);m.name=name;m.position.set(x,y,z);m.rotation.x=Math.PI/2;m.scale.set(scaleX,1,scaleZ);parent.add(m);return m}
+
+    cyl(femur,'Fémur distal',[0,1.95,0],[0,.76,.02],.185,boneMat2);sphere(femur,'Metáfisis femoral',0,.70,.02,.35,.24,.30,boneMat);sphere(femur,'Cóndilo medial',-.25,.43,.05,.32,.24,.36,boneMat);sphere(femur,'Cóndilo lateral',.25,.43,.05,.32,.24,.36,boneMat);sphere(femur,'Cartílago medial',-.25,.285,.05,.30,.055,.33,cartMat);sphere(femur,'Cartílago lateral',.25,.285,.05,.30,.055,.33,cartMat);
+    cyl(tibia,'Tibia proximal',[0,-.20,0],[0,-1.65,0],.165,boneMat2);sphere(tibia,'Meseta tibial',0,-.12,.02,.52,.19,.40,boneMat);sphere(tibia,'Cartílago tibial medial',-.22,.00,.02,.27,.055,.27,cartMat);sphere(tibia,'Cartílago tibial lateral',.22,.00,.02,.27,.055,.27,cartMat);cyl(tibia,'Peroné',[.46,-.22,-.04],[.47,-1.45,-.06],.062,boneMat2);sphere(tibia,'Cabeza del peroné',.46,-.18,-.04,.12,.11,.10,boneMat);
+    torus(menisci,'Menisco medial',-.23,.055,.025,.19,.025,menMat,1.15,.85);torus(menisci,'Menisco lateral',.23,.055,.025,.17,.023,menMat,1.05,.95);
+    const patella=sphere(patellaGroup,'Rótula',0,.46,.55,.20,.29,.075,boneMat);sphere(patellaGroup,'Cartílago patelar',0,.42,.49,.16,.22,.025,cartMat);
     cyl(ligaments,'LCA educativo',[-.09,.08,.08],[.12,.43,-.10],.025,ligMat);cyl(ligaments,'LCP educativo',[.09,.06,-.08],[-.12,.43,.12],.025,ligMat);cyl(ligaments,'Colateral medial',[-.53,.42,0],[-.47,-.18,0],.023,ligMat);cyl(ligaments,'Colateral lateral',[.53,.42,0],[.48,-.20,-.03],.023,ligMat);
     sphere(prosthesis,'Componente femoral medial',-.25,.285,.05,.29,.04,.33,metalMat);sphere(prosthesis,'Componente femoral lateral',.25,.285,.05,.29,.04,.33,metalMat);box(prosthesis,'Bandeja tibial',0,-.055,.02,.82,.055,.55,metalMat);box(prosthesis,'Inserto',0,.01,.02,.75,.06,.49,polyMat);
+
     const axis=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,2.05,0),new THREE.Vector3(0,-1.78,0)]),new THREE.LineBasicMaterial({color:0x22ff88}));root.add(axis);
+    const hkaLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.55,.02,.01),new THREE.Vector3(.55,.02,.01)]),new THREE.LineBasicMaterial({color:0x60a5fa}));root.add(hkaLine);
     const cut=box(root,'Plano de corte tibial',0,.018,.02,.96,.006,.72,new THREE.MeshBasicMaterial({color:0xff3030,transparent:true,opacity:.38}));cut.visible=false;
-    const hotMat=new THREE.MeshBasicMaterial({color:0xffd24b});[['Cóndilo medial',-.52,.43,.28],['Cóndilo lateral',.52,.43,.28],['Meseta tibial',0,-.10,.42],['Rótula',0,.78,.58],['LCA',.02,.26,.18],['Corte tibial',-.52,.035,.35]].forEach(h=>{const m=sphere(hotspots,h[0],h[1],h[2],h[3],.04,.04,.04,hotMat);m.userData.label=h[0]});
-    const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2(5,5);addEventListener('pointermove',e=>{pointer.x=e.clientX/innerWidth*2-1;pointer.y=-(e.clientY/innerHeight)*2+1},{passive:true});
+    [['Cóndilo medial',-.52,.43,.28],['Cóndilo lateral',.52,.43,.28],['Meseta tibial',0,-.10,.42],['Rótula',0,.78,.58],['LCA',.02,.26,.18],['Corte tibial',-.52,.035,.35],['Eje mecánico',.08,1.2,.04]].forEach(h=>{const m=sphere(hotspots,h[0],h[1],h[2],h[3],.04,.04,.04,hotMat);m.userData.label=h[0]});
+
+    const raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2(5,5);
+    addEventListener('pointermove',e=>{pointer.x=e.clientX/innerWidth*2-1;pointer.y=-(e.clientY/innerHeight)*2+1},{passive:true});
     function updateLabel(){raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(hotspots.children,false)[0];if(hit&&hotspots.visible){const p=hit.object.getWorldPosition(new THREE.Vector3());p.project(camera);label.style.left=(p.x*.5+.5)*innerWidth+'px';label.style.top=(-p.y*.5+.5)*innerHeight+'px';label.textContent=hit.object.userData.label;label.style.display='block'}else label.style.display='none'}
-    function updateDiag(msg='Listo'){diag.textContent=['Modelo procedural OK','Hosting: GitHub','Prótesis: '+(prosthesis.visible?'visible':'oculta'),'Eje: '+(axis.visible?'visible':'oculto'),'Corte: '+(cut.visible?'visible':'oculto'),msg].join('\n')}
-    window.toggle=name=>{if(name==='prosthesis')prosthesis.visible=!prosthesis.visible;if(name==='axis')axis.visible=!axis.visible;if(name==='cut')cut.visible=!cut.visible;if(name==='ligaments')ligaments.visible=!ligaments.visible;if(name==='hotspots')hotspots.visible=!hotspots.visible;updateDiag('Toggle '+name)};
-    window.toggleFlex=()=>{state.flex=!state.flex;updateDiag(state.flex?'Flex/ext activa':'Flex/ext pausada')};window.toggleInfo=()=>document.getElementById('info').classList.toggle('open');
-    window.resetCamera=()=>{camera.position.set(1.6,1.1,3.15);controls.target.set(0,.15,0);controls.update();updateDiag('Cámara reiniciada')};
-    window.view=v=>{if(v==='front')camera.position.set(0,.35,3.2);if(v==='lateral')camera.position.set(3.2,.35,0);controls.target.set(0,.15,0);controls.update();updateDiag('Vista '+v)};
-    function animate(){requestAnimationFrame(animate);if(state.flex){state.angle+=.006*state.dir;if(state.angle>.42)state.dir=-1;if(state.angle<-.04)state.dir=1;tibiaGroup.rotation.x=state.angle;patella.position.y=.46+Math.sin(state.angle)*.12;patella.position.z=.55+Math.sin(state.angle)*.16}controls.update();updateLabel();renderer.render(scene,camera)}
-    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});addEventListener('error',e=>updateDiag('ERROR: '+e.message));updateDiag();animate();
+    function message(t){toast.textContent=t;toast.style.display='block';clearTimeout(message.t);message.t=setTimeout(()=>toast.style.display='none',1800)}
+    function updateDiag(msg='Listo'){diag.textContent=['Three.js OK','GitHub hosting','Prótesis: '+(prosthesis.visible?'visible':'oculta'),'Eje: '+(axis.visible?'visible':'oculto'),'Corte: '+(cut.visible?'visible':'oculto'),msg].join('\n')}
+
+    window.toggle=name=>{if(name==='prosthesis')prosthesis.visible=!prosthesis.visible;if(name==='axis')axis.visible=!axis.visible;if(name==='cut')cut.visible=!cut.visible;if(name==='ligaments')ligaments.visible=!ligaments.visible;if(name==='hotspots')hotspots.visible=!hotspots.visible;if(name==='menisci')menisci.visible=!menisci.visible;updateDiag('Toggle '+name);message('Toggle '+name)};
+    window.toggleFlex=()=>{state.flex=!state.flex;message(state.flex?'Flex/ext activa':'Flex/ext pausada')};
+    window.toggleSheet=()=>$('sheet').classList.toggle('open');window.toggleDiag=()=>diag.classList.toggle('open');
+    window.toggleInfo=()=>$('sheet').classList.toggle('open');
+    window.resetCamera=()=>{camera.position.set(1.65,1.15,3.2);controls.target.set(0,.15,0);controls.update();message('Cámara reset')};
+    window.view=v=>{if(v==='front')camera.position.set(0,.35,3.2);if(v==='lateral')camera.position.set(3.2,.35,0);if(v==='axial')camera.position.set(0,3.35,.01);controls.target.set(0,.12,0);controls.update();message('Vista '+v)};
+    window.applySliders=()=>{const valgus=+$('valgus').value,slope=+$('slope').value,size=+$('size').value/100,op=+$('opacity').value/100;$('valgusVal').textContent=valgus+'°';$('slopeVal').textContent=slope+'°';$('sizeVal').textContent=Math.round(size*100)+'%';$('opacityVal').textContent=Math.round(op*100)+'%';tibia.rotation.z=THREE.MathUtils.degToRad(valgus*.6);cut.rotation.x=THREE.MathUtils.degToRad(slope);prosthesis.scale.set(size,size,size);boneMaterials.forEach(m=>{m.opacity=op;m.transparent=op<1});$('hka').textContent=(180+valgus)+'°';$('gap').textContent=(Math.abs(valgus)*.7).toFixed(1)+' mm';updateDiag('Parámetros actualizados')};
+    window.modePatient=()=>{prosthesis.visible=true;axis.visible=false;cut.visible=false;ligaments.visible=false;menisci.visible=true;hotspots.visible=true;message('Modo paciente')};
+    window.modeSurgeon=()=>{prosthesis.visible=true;axis.visible=true;cut.visible=true;ligaments.visible=true;menisci.visible=true;hotspots.visible=true;message('Modo cirujano')};
+    window.copyLink=async()=>{try{await navigator.clipboard.writeText(location.href);message('Link copiado')}catch{message('No pude copiar')}};
+
+    function animate(){requestAnimationFrame(animate);if(state.flex){state.angle+=.006*state.dir;if(state.angle>.42)state.dir=-1;if(state.angle<-.04)state.dir=1;tibia.rotation.x=state.angle;patellaGroup.position.y=Math.sin(state.angle)*.12;patellaGroup.position.z=Math.sin(state.angle)*.16}controls.update();updateLabel();renderer.render(scene,camera)}
+    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});addEventListener('error',e=>updateDiag('ERROR: '+e.message));
+    updateDiag();applySliders();animate();setTimeout(()=>message('Rodilla 3D lista'),600);
   </script>
 </body>
 </html>
