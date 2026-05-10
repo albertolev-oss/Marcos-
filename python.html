@@ -5,30 +5,44 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Python Pocket Marcos</title>
 <style>
-:root{--bg:#050b18;--card:#101b2e;--card2:#050b18;--txt:#f8fafc;--mut:#9fb0c7;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--gray:#334155;--bd:rgba(255,255,255,.13)}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,rgba(37,99,235,.28),transparent 38%),var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif}.app{max-width:920px;margin:auto;padding:14px;padding-bottom:30px}.card{background:rgba(16,27,46,.95);border:1px solid var(--bd);border-radius:22px;padding:16px;box-shadow:0 18px 55px rgba(0,0,0,.35);margin-bottom:12px}h1{margin:0 0 6px;font-size:28px}.sub{color:var(--mut);line-height:1.4;margin:0}.pill{display:inline-block;margin-top:10px;padding:7px 10px;border-radius:999px;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.38);color:#bbf7d0;font-size:13px;font-weight:900}textarea{width:100%;min-height:260px;border:1px solid var(--bd);border-radius:16px;background:var(--card2);color:var(--txt);padding:14px;font-size:14px;line-height:1.45;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}button{width:100%;border:0;border-radius:15px;color:#fff;background:var(--gray);padding:13px 10px;font-size:15px;font-weight:900;margin-top:8px}.green{background:var(--green)}.blue{background:var(--blue)}.red{background:var(--red)}.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.out{white-space:pre-wrap;background:#020817;border:1px solid var(--bd);border-radius:16px;padding:14px;min-height:180px;color:#dbeafe;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.45}.status{font-size:13px;color:#a7f3d0;margin-top:8px;white-space:pre-wrap}@media(max-width:680px){.grid{grid-template-columns:1fr}textarea{min-height:230px}h1{font-size:25px}}
+:root{--bg:#050b18;--card:rgba(16,27,46,.95);--card2:#050b18;--txt:#f8fafc;--mut:#9fb0c7;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--gray:#334155;--bd:rgba(255,255,255,.13)}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,rgba(37,99,235,.30),transparent 38%),var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif}.app{max-width:980px;margin:auto;padding:14px;padding-bottom:30px}.card{background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:16px;box-shadow:0 18px 55px rgba(0,0,0,.35);margin-bottom:12px}h1{margin:0 0 6px;font-size:28px}h2{margin:0 0 10px}.sub{color:var(--mut);line-height:1.4;margin:0}.pill{display:inline-block;margin-top:10px;padding:7px 10px;border-radius:999px;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.38);color:#bbf7d0;font-size:13px;font-weight:900}textarea{width:100%;min-height:260px;border:1px solid var(--bd);border-radius:16px;background:var(--card2);color:var(--txt);padding:14px;font-size:14px;line-height:1.45;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}button{width:100%;border:0;border-radius:15px;color:#fff;background:var(--gray);padding:13px 10px;font-size:15px;font-weight:900;margin-top:8px}.green{background:var(--green)}.blue{background:var(--blue)}.red{background:var(--red)}.orange{background:var(--orange)}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.out{white-space:pre-wrap;background:#020817;border:1px solid var(--bd);border-radius:16px;padding:14px;min-height:220px;color:#dbeafe;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.45}.preview{background:#f8fafc;color:#0f172a;border-radius:18px;padding:18px;min-height:220px;overflow:auto;box-shadow:inset 0 0 0 1px rgba(15,23,42,.08)}.preview h3{margin:14px 0 8px;color:#0b3b7a}.preview .line{padding:5px 0;border-bottom:1px solid rgba(15,23,42,.08)}.preview .alert{background:#fff7ed;border-left:4px solid #ea580c;padding:10px;border-radius:10px;margin:8px 0}.preview .ok{background:#ecfdf5;border-left:4px solid #16a34a;padding:10px;border-radius:10px;margin:8px 0}.status{font-size:13px;color:#a7f3d0;margin-top:8px;white-space:pre-wrap}.small{font-size:13px;color:var(--mut);line-height:1.35}@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}.split{grid-template-columns:1fr}textarea{min-height:230px}h1{font-size:25px}}
 </style>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.29.4/full/pyodide.js"></script>
 </head>
 <body>
 <main class="app">
-<section class="card"><h1>Python Pocket Marcos</h1><p class="sub">Ejecutá Python dentro del navegador con Pyodide. No usa servidor, Netlify ni API.</p><span class="pill" id="pill">Cargando Python...</span><div class="status" id="status"></div></section>
-<section class="card"><textarea id="code"># Python en Pocket / Safari
-print('Hola Marcos')
+<section class="card"><h1>Python Pocket Marcos</h1><p class="sub">Ejecutá Python en el navegador y mirá una vista previa limpia del resultado.</p><span class="pill" id="pill">Cargando Python...</span><div class="status" id="status"></div></section>
+<section class="card"><textarea id="code"># Plan educativo ATR con vista previa
+paciente = 'Paciente ejemplo'
+lado = 'Derecha'
+diagnostico = 'Gonartrosis primaria varo'
+varo_valgo = -8
+slope = 3
+rom = '5-105'
 
-# Ejemplo traumatología educativo
-varo_valgo = 6
 hka = 180 + varo_valgo
-gap_conceptual = abs(varo_valgo) * 0.7
+gap = abs(varo_valgo) * 0.7
 
+print('PLAN EDUCATIVO ATR')
+print('Paciente:', paciente)
+print('Lado:', lado)
+print('Diagnóstico:', diagnostico)
+print('ROM:', rom)
 print('HKA conceptual:', hka, 'grados')
-print('Gap conceptual:', round(gap_conceptual, 1), 'mm')
-
-for paso in ['incisión', 'exposición', 'resección', 'prueba', 'implante']:
-    print('Paso:', paso)</textarea><div class="grid"><button class="green" onclick="runCode()">▶ Ejecutar Python</button><button class="blue" onclick="loadExample()">Ejemplo ATR</button><button class="red" onclick="clearOutput()">Limpiar salida</button></div></section>
-<section class="card"><h2>Salida</h2><div id="output" class="out">Esperando Python...</div></section>
+print('Slope conceptual:', slope, 'grados')
+print('Gap conceptual:', round(gap, 1), 'mm')
+print('')
+print('PASO A PASO')
+for p in ['1. Incisión en piel','2. Exposición','3. Eversión rotuliana','4. Resección femoral','5. Resección tibial','6. Prueba','7. Implante','8. Prótesis final']:
+    print(p)
+print('')
+print('AVISO: educativo, no usar para planificación quirúrgica real.')</textarea><div class="grid"><button class="green" onclick="runCode()">▶ Ejecutar</button><button class="blue" onclick="renderPreview(getOutput())">Vista previa</button><button onclick="copyOutput()">Copiar</button><button class="orange" onclick="downloadOutput()">Descargar TXT</button><button class="red" onclick="clearOutput()">Limpiar</button></div><p class="small">La vista previa se actualiza automáticamente después de ejecutar. La primera carga de Python puede tardar.</p></section>
+<section class="split"><div class="card"><h2>Salida Python</h2><div id="output" class="out">Esperando Python...</div></div><div class="card"><h2>Vista previa</h2><div id="preview" class="preview">La vista previa aparecerá acá.</div></div></section>
+<section class="card"><button class="blue" onclick="loadExample()">Cargar ejemplo avanzado ATR</button></section>
 </main>
 <script>
-let pyodide=null;const $=id=>document.getElementById(id);async function init(){try{$('status').textContent='Descargando runtime de Python. La primera vez puede tardar...';pyodide=await loadPyodide();$('pill').textContent='Python listo';$('status').textContent='Listo. Tocá Ejecutar Python.';$('output').textContent='Python cargado correctamente.'}catch(e){$('pill').textContent='Error';$('status').textContent='No pudo cargar Pyodide. Revisá internet o abrí en Safari/Chrome moderno.\n'+e.message;$('output').textContent=e.stack||e.message}}async function runCode(){if(!pyodide){$('output').textContent='Python todavía está cargando...';return}const userCode=$('code').value;const wrapped=`
+let pyodide=null;const $=id=>document.getElementById(id);function getOutput(){return $('output').textContent||''}function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}async function init(){try{$('status').textContent='Descargando runtime de Python...';pyodide=await loadPyodide();$('pill').textContent='Python listo';$('status').textContent='Listo. Tocá Ejecutar.';$('output').textContent='Python cargado correctamente.';renderPreview('Python cargado correctamente.')}catch(e){$('pill').textContent='Error';$('status').textContent='No pudo cargar Pyodide. Revisá internet o abrí en Safari/Chrome moderno.\n'+e.message;$('output').textContent=e.stack||e.message;renderPreview(getOutput())}}
+async function runCode(){if(!pyodide){$('output').textContent='Python todavía está cargando...';renderPreview(getOutput());return}const userCode=$('code').value;const wrapped=`
 import sys, io, traceback
 _buf = io.StringIO()
 _oldout, _olderr = sys.stdout, sys.stderr
@@ -43,42 +57,66 @@ finally:
     sys.stderr = _olderr
 _result = _buf.getvalue()
 _result
-`;try{$('output').textContent='Ejecutando...';const result=await pyodide.runPythonAsync(wrapped);$('output').textContent=result||'(sin salida)'}catch(e){$('output').textContent=e.stack||e.message}}function clearOutput(){$('output').textContent=''}function loadExample(){$('code').value=`# Calculadora educativa ATR
-# No usar para decisiones clínicas reales
-
+`;try{$('output').textContent='Ejecutando...';const result=await pyodide.runPythonAsync(wrapped);$('output').textContent=result||'(sin salida)';renderPreview(getOutput())}catch(e){$('output').textContent=e.stack||e.message;renderPreview(getOutput())}}
+function renderPreview(text){const lines=String(text||'').split('\n');let html='';for(const raw of lines){const line=raw.trim();if(!line){html+='<br>';continue}const up=line.toUpperCase();if(line.includes('AVISO')||line.includes('Alerta')||line.includes('ERROR')||line.includes('Traceback')) html+='<div class="alert">'+esc(line)+'</div>';else if(line.includes('OK')||line.includes('Listo')||line.includes('correctamente')) html+='<div class="ok">'+esc(line)+'</div>';else if(up===line && line.length>3) html+='<h3>'+esc(line)+'</h3>';else html+='<div class="line">'+esc(line)+'</div>'}$('preview').innerHTML=html||'Sin contenido.'}
+function clearOutput(){$('output').textContent='';$('preview').innerHTML='La vista previa aparecerá acá.'}async function copyOutput(){try{await navigator.clipboard.writeText(getOutput());alert('Salida copiada.')}catch{alert('No pude copiar automático.')}}function downloadOutput(){const blob=new Blob([getOutput()],{type:'text/plain'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='salida-python-marcos.txt';a.click();URL.revokeObjectURL(url)}
+function loadExample(){$('code').value=`# Informe educativo ATR completo
+paciente = 'Paciente ejemplo'
+edad = 68
 lado = 'Derecha'
-diagnostico = 'Gonartrosis primaria'
-varo_valgo = -8   # negativo = varo conceptual, positivo = valgo conceptual
+diagnostico = 'Gonartrosis primaria varo'
+varo_valgo = -8
+flexo = 5
+rom_flexion = 105
 slope = 3
-rom_preop = '5-105'
+fijacion = 'cementada'
+restriccion = 'CR/PS según caso'
+patela = 'evaluar según caso'
 
 hka = 180 + varo_valgo
 gap = abs(varo_valgo) * 0.7
+rom_util = rom_flexion - flexo
 
 print('PLAN EDUCATIVO ATR')
+print('Paciente:', paciente)
+print('Edad:', edad)
 print('Lado:', lado)
-print('Dx:', diagnostico)
-print('ROM preop:', rom_preop)
+print('Diagnóstico:', diagnostico)
+print('')
+print('ALINEACIÓN Y MOVILIDAD')
+print('Varo/valgo conceptual:', varo_valgo, 'grados')
 print('HKA conceptual:', hka, 'grados')
-print('Slope conceptual:', slope, 'grados')
+print('Slope tibial conceptual:', slope, 'grados')
+print('Flexo:', flexo, 'grados')
+print('Flexión máxima:', rom_flexion, 'grados')
+print('ROM útil conceptual:', rom_util, 'grados')
 print('Gap conceptual:', round(gap, 1), 'mm')
-
-if abs(varo_valgo) > 10:
-    print('Alerta educativa: deformidad importante, revisar balance y restricción.')
-else:
-    print('Deformidad conceptual moderada.')
-
+print('')
+print('PLAN DE IMPLANTE EDUCATIVO')
+print('Fijación:', fijacion)
+print('Restricción:', restriccion)
+print('Patela:', patela)
+print('')
+print('PASO A PASO')
 pasos = [
-    '1. Marcación e incisión',
-    '2. Exposición',
-    '3. Preparación ósea',
-    '4. Balance de gaps',
-    '5. Prueba de componentes',
-    '6. Implante definitivo'
+ '1. Marcación e incisión en piel',
+ '2. Apertura y exposición',
+ '3. Eversión/lateralización rotuliana',
+ '4. Preparación femoral conceptual',
+ '5. Preparación tibial conceptual',
+ '6. Balance y prueba de componentes',
+ '7. Implante definitivo',
+ '8. Prótesis final y cierre'
 ]
-
 for p in pasos:
     print(p)
+print('')
+if abs(varo_valgo) >= 10:
+    print('ALERTA: deformidad importante, revisar estrategia educativa de balance.')
+else:
+    print('OK: deformidad conceptual moderada.')
+print('')
+print('AVISO: informe educativo. No usar para planificación quirúrgica real.')
 `}
 init();
 </script>
