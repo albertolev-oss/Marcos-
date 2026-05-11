@@ -7,9 +7,10 @@ const $ = id => document.getElementById(id);
 const ui = {
   loader: $('loader'), status: $('status'), panel: $('panel'), toast: $('toast'), labels: $('labelLayer'),
   controls: $('controls'), closePanel: $('closePanel'), file: $('modelInput'), subtitle: $('subtitle'),
+  cursor: $('virtualCursor'), cursorDot: $('cursorDot'), cursorCoords: $('cursorCoords'),
   inclination: $('inclination'), anteversion: $('anteversion'), offset: $('offset'), neck: $('neck'), boneOpacity: $('boneOpacity')
 };
-const state = { bones:true, implant:true, xray:false, labels:false, axes:false, cut:false, explode:false, motion:false, navigation:false, loaded:false };
+const state = { bones:true, implant:true, xray:false, labels:false, axes:false, cut:false, explode:false, motion:false, navigation:false, cursor:false, loaded:false };
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050b16);
@@ -45,6 +46,10 @@ const mat = {
 };
 let head, cutPlane, planRing, actualRing, pointerBall, offBase = 0;
 const labelItems = [];
+const raycaster = new THREE.Raycaster();
+const cursorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -.28);
+const cursorHit = new THREE.Vector3();
+const cursorPos = { x: innerWidth * .5, y: innerHeight * .5, active: false };
 
 function toast(t){ ui.toast.textContent=t; ui.toast.style.display='block'; clearTimeout(toast.t); toast.t=setTimeout(()=>ui.toast.style.display='none',1600); }
 function status(t,k='ok'){ ui.status.textContent=t; ui.status.className='status '+k; }
@@ -92,12 +97,30 @@ function buildGuide(){
 function normalize(obj){ obj.traverse(c=>{ if(c.isMesh){ c.material=mat.bone; c.geometry.computeVertexNormals(); }}); const box=new THREE.Box3().setFromObject(obj), size=new THREE.Vector3(), center=new THREE.Vector3(); box.getSize(size); box.getCenter(center); obj.position.sub(center); obj.scale.multiplyScalar(3.15/(Math.max(size.x,size.y,size.z)||1)); return obj; }
 function loadModel(file){ if(!file) return; const ext=file.name.split('.').pop().toLowerCase(), url=URL.createObjectURL(file); status('cargando','pending'); toast('Cargando archivo'); const done=obj=>{ real.clear(); real.add(normalize(obj)); state.loaded=true; state.bones=true; state.navigation=true; state.axes=true; state.cut=true; state.labels=false; ui.subtitle.textContent='Modelo OBJ/STL cargado localmente. No se sube a GitHub.'; apply(); setView('oblique'); status('modelo local','ok'); toast('Modelo cargado'); URL.revokeObjectURL(url); }; const fail=e=>{ console.error(e); status('error','err'); toast('No pude cargar el archivo'); URL.revokeObjectURL(url); }; if(ext==='obj') new OBJLoader().load(url,done,undefined,fail); else if(ext==='stl') new STLLoader().load(url,g=>done(new THREE.Mesh(g,mat.bone)),undefined,fail); else { toast('Usa OBJ o STL'); URL.revokeObjectURL(url); } }
 function update(){ const inc=+ui.inclination.value, ant=+ui.anteversion.value, off=+ui.offset.value, neck=+ui.neck.value, bone=+ui.boneOpacity.value/100; offBase=off/120; $('inclinationValue').textContent=inc+'°'; $('anteversionValue').textContent=ant+'°'; $('offsetValue').textContent=off+' mm'; $('neckValue').textContent=neck+' mm'; $('boneOpacityValue').textContent=Math.round(bone*100)+'%'; $('offsetMetric').textContent=off+' mm'; $('legMetric').textContent=(neck>0?'+':'')+neck+' mm'; $('versionMetric').textContent=ant+'°'; $('safeMetric').textContent=inc>=35&&inc<=50&&ant>=10&&ant<=25?'Zona segura':'Revisar'; if(actualRing){ actualRing.rotation.z=THREE.MathUtils.degToRad(inc-40); actualRing.rotation.y=THREE.MathUtils.degToRad(ant-15); } if(head) head.position.z=.302+neck/160; if(!state.xray)[mat.bone,mat.bone2].forEach(m=>opacity(m,bone)); }
-function apply(){ demo.visible=state.bones&&!state.loaded; real.visible=state.bones&&state.loaded; implant.visible=state.implant; guide.visible=state.navigation||state.axes||state.cut; if(cutPlane) cutPlane.visible=state.cut||state.navigation; if(planRing) planRing.visible=state.navigation; if(actualRing) actualRing.visible=state.navigation; if(pointerBall) pointerBall.visible=state.navigation; document.body.classList.toggle('xr',state.xray); if(state.xray)[mat.bone,mat.bone2].forEach(m=>opacity(m,.24)); else update(); labelItems.forEach(i=>i.card.style.display=state.labels?'block':'none'); document.querySelectorAll('#controls button').forEach(b=>{ const k=b.dataset.toggle; if(k)b.classList.toggle('active',!!state[k]); }); }
+function apply(){ demo.visible=state.bones&&!state.loaded; real.visible=state.bones&&state.loaded; implant.visible=state.implant; guide.visible=state.navigation||state.axes||state.cut||state.cursor; if(cutPlane) cutPlane.visible=state.cut||state.navigation; if(planRing) planRing.visible=state.navigation; if(actualRing) actualRing.visible=state.navigation; if(pointerBall) pointerBall.visible=state.navigation||state.cursor; document.body.classList.toggle('xr',state.xray); document.body.classList.toggle('cursorOn',state.cursor); if(state.xray)[mat.bone,mat.bone2].forEach(m=>opacity(m,.24)); else update(); labelItems.forEach(i=>i.card.style.display=state.labels?'block':'none'); document.querySelectorAll('#controls button').forEach(b=>{ const k=b.dataset.toggle; if(k)b.classList.toggle('active',!!state[k]); }); }
 function setView(name){ const v={ap:[[.38,.26,4.65],[.34,.12,.02]],lateral:[[4.35,.28,.08],[.34,.12,.02]],axial:[[.35,4.65,.08],[.35,.10,.04]],oblique:[[2.8,1.4,4.1],[.30,.05,0]]}[name]||[[2.8,1.4,4.1],[.30,.05,0]]; camera.position.set(...v[0]); orbit.target.set(...v[1]); orbit.update(); toast('Vista '+name.toUpperCase()); }
-function reset(){ Object.assign(state,{bones:true,implant:true,xray:false,labels:false,axes:false,cut:false,explode:false,motion:false,navigation:false}); ui.inclination.value=40; ui.anteversion.value=15; ui.offset.value=0; ui.neck.value=0; ui.boneOpacity.value=100; update(); apply(); setView('oblique'); }
-function handle(btn){ const k=btn.dataset.toggle, a=btn.dataset.action, v=btn.dataset.view; if(k){ state[k]=!state[k]; if(k==='navigation'&&state[k]){state.axes=true;state.cut=true;ui.panel.classList.add('open')} apply(); toast(k+': '+(state[k]?'ON':'OFF')); } if(v)setView(v); if(a==='load')ui.file.click(); if(a==='panel')ui.panel.classList.toggle('open'); if(a==='reset')reset(); if(a==='test'){status('online','ok');toast('JavaScript funcionando')} }
+function reset(){ Object.assign(state,{bones:true,implant:true,xray:false,labels:false,axes:false,cut:false,explode:false,motion:false,navigation:false,cursor:false}); ui.inclination.value=40; ui.anteversion.value=15; ui.offset.value=0; ui.neck.value=0; ui.boneOpacity.value=100; update(); apply(); setView('oblique'); }
+function handle(btn){ const k=btn.dataset.toggle, a=btn.dataset.action, v=btn.dataset.view; if(k){ state[k]=!state[k]; if(k==='navigation'&&state[k]){state.axes=true;state.cut=true;ui.panel.classList.add('open')} if(k==='cursor'&&state[k]){state.navigation=true;state.axes=true;setCursor(cursorPos.x,cursorPos.y);toast('Cursor virtual activo')} apply(); toast(k+': '+(state[k]?'ON':'OFF')); } if(v)setView(v); if(a==='load')ui.file.click(); if(a==='panel')ui.panel.classList.toggle('open'); if(a==='reset')reset(); if(a==='test'){status('online','ok');toast('JavaScript funcionando')} }
 function updateLabels(){ const v=new THREE.Vector3(); for(const item of labelItems){ if(!state.labels||!item.target.visible){item.card.style.display='none';continue} item.target.getWorldPosition(v); v.project(camera); if(v.z<-1||v.z>1){item.card.style.display='none';continue} item.card.style.display='block'; item.card.style.left=((v.x*.5+.5)*innerWidth)+'px'; item.card.style.top=((-v.y*.5+.5)*innerHeight)+'px'; } }
+function setCursor(x,y){
+  cursorPos.x=THREE.MathUtils.clamp(x,18,innerWidth-18); cursorPos.y=THREE.MathUtils.clamp(y,18,innerHeight-18);
+  ui.cursorDot.style.left=cursorPos.x+'px'; ui.cursorDot.style.top=cursorPos.y+'px';
+  raycaster.setFromCamera(new THREE.Vector2(cursorPos.x/innerWidth*2-1,-(cursorPos.y/innerHeight)*2+1),camera);
+  if(pointerBall&&raycaster.ray.intersectPlane(cursorPlane,cursorHit)){
+    pointerBall.position.copy(guide.worldToLocal(cursorHit.clone()));
+    ui.cursorCoords.textContent='X '+Math.round(cursorHit.x*100)+' · Y '+Math.round(cursorHit.y*100)+' · Z '+Math.round(cursorHit.z*100);
+  }
+}
+function cursorEvent(e){
+  if(!state.cursor) return;
+  e.preventDefault(); e.stopPropagation();
+  setCursor(e.clientX,e.clientY);
+}
+ui.cursorDot.addEventListener('pointerdown',e=>{cursorPos.active=true; ui.cursorDot.setPointerCapture(e.pointerId); cursorEvent(e)});
+ui.cursorDot.addEventListener('pointermove',e=>{if(cursorPos.active)cursorEvent(e)});
+ui.cursorDot.addEventListener('pointerup',e=>{cursorPos.active=false; ui.cursorDot.releasePointerCapture(e.pointerId)});
+ui.cursorDot.addEventListener('pointercancel',()=>{cursorPos.active=false});
 
-ui.controls.addEventListener('click',e=>{const b=e.target.closest('button'); if(b)handle(b)}); ui.file.addEventListener('change',e=>loadModel(e.target.files[0])); ui.closePanel.addEventListener('click',()=>ui.panel.classList.remove('open')); [ui.inclination,ui.anteversion,ui.offset,ui.neck,ui.boneOpacity].forEach(s=>s.addEventListener('input',update)); addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)},{passive:true});
+ui.controls.addEventListener('click',e=>{const b=e.target.closest('button'); if(b)handle(b)}); ui.file.addEventListener('change',e=>loadModel(e.target.files[0])); ui.closePanel.addEventListener('click',()=>ui.panel.classList.remove('open')); [ui.inclination,ui.anteversion,ui.offset,ui.neck,ui.boneOpacity].forEach(s=>s.addEventListener('input',update)); addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);setCursor(cursorPos.x,cursorPos.y)},{passive:true});
 buildDemo(); buildImplant(); buildGuide(); update(); apply(); setView('oblique'); status('online','ok'); ui.loader.classList.add('hide'); toast('Visor listo');
 function animate(){requestAnimationFrame(animate); const t=performance.now()*.001; if(state.motion)implant.rotation.y=Math.sin(t*1.2)*.12; else implant.rotation.y*=.92; const target=state.explode?new THREE.Vector3(offBase+.34,-.04,.16):new THREE.Vector3(offBase,0,0); implant.position.lerp(target,.10); orbit.update(); updateLabels(); renderer.render(scene,camera)} animate();
