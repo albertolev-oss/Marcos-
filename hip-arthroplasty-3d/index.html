@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Cadera 3D · Artroplastia Total</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="viewer"></canvas>
+
+  <header id="topbar" class="glass">
+    <div>
+      <p class="eyebrow">Traumatología · modelo educativo</p>
+      <h1>Artroplastia total de cadera 3D</h1>
+      <p class="sub">Pelvis, fémur proximal, cotilo, cabeza, cuello y vástago. Vista táctil para iPhone.</p>
+    </div>
+    <span id="status" class="pill">● cargando</span>
+  </header>
+
+  <aside id="panel" class="glass">
+    <h2>Panel</h2>
+    <p>Modelo didáctico aproximado. No usar para planificación quirúrgica real.</p>
+
+    <label>Inclinación cotilo <span id="inclinationValue">40°</span></label>
+    <input id="inclination" type="range" min="25" max="60" value="40" step="1" />
+
+    <label>Anteversión <span id="anteversionValue">15°</span></label>
+    <input id="anteversion" type="range" min="0" max="35" value="15" step="1" />
+
+    <label>Offset femoral <span id="offsetValue">0 mm</span></label>
+    <input id="offset" type="range" min="-12" max="12" value="0" step="1" />
+
+    <div class="metrics">
+      <div><b id="cupMetric">40°</b><span>Cotilo</span></div>
+      <div><b id="legMetric">0 mm</b><span>Offset</span></div>
+    </div>
+  </aside>
+
+  <div id="label"></div>
+  <div id="toast"></div>
+
+  <nav id="controls" class="glass">
+    <button class="blue" data-action="implant">Implante</button>
+    <button data-action="bones">Hueso</button>
+    <button data-action="xray">Rx</button>
+    <button data-action="labels">Puntos</button>
+    <button data-view="front">Frente</button>
+    <button data-view="lateral">Lateral</button>
+    <button data-view="axial">Axial</button>
+    <button class="green" data-action="reset">Reset</button>
+    <button class="orange" data-action="panel">Panel</button>
+    <button class="red" data-action="test">Probar JS</button>
+  </nav>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
