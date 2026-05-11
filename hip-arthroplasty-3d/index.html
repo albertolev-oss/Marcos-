@@ -93,11 +93,20 @@
 
   <input id="modelInput" type="file" accept=".obj,.stl" hidden />
   <div id="labelLayer"></div>
+  <div id="virtualCursor" aria-live="polite" aria-label="Cursor virtual para celular">
+    <div id="cursorDot"><span></span></div>
+    <div class="cursorPanel glass">
+      <b>Cursor virtual</b>
+      <small>Arrastrá el punto para posicionar el puntero verde.</small>
+      <output id="cursorCoords">X 0 · Y 0</output>
+    </div>
+  </div>
   <div id="toast"></div>
 
   <nav id="controls" class="glass" aria-label="Controles del modelo">
     <button class="primary" data-action="load">Cargar real</button>
     <button data-toggle="navigation">Navegación</button>
+    <button data-toggle="cursor">Cursor</button>
     <button data-toggle="implant">Implante</button>
     <button data-toggle="bones">Hueso</button>
     <button data-toggle="xray">Modo Rx</button>

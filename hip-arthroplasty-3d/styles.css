@@ -94,3 +94,24 @@ body.xr{background:#030712}
   #toast{bottom:calc(164px + env(safe-area-inset-bottom,0))}
 }
 @media(max-width:380px){#topbar p{display:none}#panel{top:calc(112px + env(safe-area-inset-top,0))}}
+#virtualCursor{
+  position:fixed;inset:0;z-index:45;display:none;pointer-events:none;touch-action:none;
+}
+body.cursorOn #virtualCursor{display:block;pointer-events:none}
+#cursorDot{
+  position:absolute;left:50%;top:50%;width:54px;height:54px;transform:translate(-50%,-50%);pointer-events:auto;
+  border:2px solid rgba(34,255,136,.92);border-radius:50%;
+  background:radial-gradient(circle,rgba(34,255,136,.24),rgba(34,255,136,.06) 45%,transparent 68%);
+  box-shadow:0 0 0 9px rgba(34,255,136,.08),0 0 28px rgba(34,255,136,.55);
+}
+#cursorDot::before,#cursorDot::after{
+  content:"";position:absolute;left:50%;top:50%;background:rgba(255,255,255,.9);transform:translate(-50%,-50%);
+}
+#cursorDot::before{width:78px;height:2px}#cursorDot::after{width:2px;height:78px}
+#cursorDot span{position:absolute;left:50%;top:50%;width:9px;height:9px;background:#22ff88;border-radius:50%;transform:translate(-50%,-50%)}
+.cursorPanel{
+  position:absolute;pointer-events:none;left:50%;bottom:calc(108px + env(safe-area-inset-bottom,0));transform:translateX(-50%);
+  width:min(330px,calc(100vw - 28px));border-radius:20px;padding:10px 12px;text-align:center;
+}
+.cursorPanel b{display:block;font-size:13px}.cursorPanel small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.cursorPanel output{display:block;color:#bbf7d0;font-size:12px;font-weight:950;margin-top:6px}
+@media(max-width:680px){.cursorPanel{bottom:calc(164px + env(safe-area-inset-bottom,0))}#cursorDot{width:48px;height:48px}}
