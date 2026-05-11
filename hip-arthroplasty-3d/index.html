@@ -3,63 +3,125 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#07111f" />
-  <title>Cadera 3D · Artroplastia Total</title>
+  <meta name="theme-color" content="#050b16" />
+  <meta name="description" content="Modelo educativo 3D de artroplastia total de cadera para traumatología." />
+  <title>Cadera 3D Pro · Artroplastia Total</title>
   <link rel="stylesheet" href="styles.css" />
   <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
     }
+  }
   </script>
 </head>
 <body>
-  <canvas id="viewer"></canvas>
+  <canvas id="viewer" aria-label="Modelo 3D de artroplastia total de cadera"></canvas>
+
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+    <strong>Cargando modelo 3D…</strong>
+    <small>Si no carga, tocá “Probar JS” cuando aparezca la interfaz.</small>
+  </div>
 
   <header id="topbar" class="glass">
-    <div>
-      <p class="eyebrow">Traumatología · modelo educativo</p>
-      <h1>Artroplastia total de cadera 3D</h1>
-      <p class="sub">Pelvis, fémur proximal, cotilo, cabeza, cuello y vástago. Vista táctil para iPhone.</p>
+    <div class="brand">
+      <span class="eyebrow">Traumatología · Educación médica</span>
+      <h1>Cadera 3D Pro</h1>
+      <p>Artroplastia total de cadera con cotilo, liner, cabeza, cuello y vástago.</p>
     </div>
-    <span id="status" class="pill">● cargando</span>
+    <div class="statusBox">
+      <span id="status" class="status pending">iniciando</span>
+      <span class="mini">GitHub Pages</span>
+    </div>
   </header>
 
   <aside id="panel" class="glass">
-    <h2>Panel</h2>
-    <p>Modelo didáctico aproximado. No usar para planificación quirúrgica real.</p>
-
-    <label>Inclinación cotilo <span id="inclinationValue">40°</span></label>
-    <input id="inclination" type="range" min="25" max="60" value="40" step="1" />
-
-    <label>Anteversión <span id="anteversionValue">15°</span></label>
-    <input id="anteversion" type="range" min="0" max="35" value="15" step="1" />
-
-    <label>Offset femoral <span id="offsetValue">0 mm</span></label>
-    <input id="offset" type="range" min="-12" max="12" value="0" step="1" />
-
-    <div class="metrics">
-      <div><b id="cupMetric">40°</b><span>Cotilo</span></div>
-      <div><b id="legMetric">0 mm</b><span>Offset</span></div>
+    <div class="panelHead">
+      <div>
+        <span class="eyebrow">Planificación conceptual</span>
+        <h2>Parámetros</h2>
+      </div>
+      <button class="iconButton" id="closePanel" aria-label="Cerrar panel">×</button>
     </div>
+
+    <p class="warning">
+      Modelo didáctico aproximado. No reemplaza radiografías calibradas, TC, navegación ni planificación quirúrgica.
+    </p>
+
+    <div class="sliderBlock">
+      <label for="inclination">Inclinación cotilo <b id="inclinationValue">40°</b></label>
+      <input id="inclination" type="range" min="25" max="60" value="40" step="1" />
+    </div>
+
+    <div class="sliderBlock">
+      <label for="anteversion">Anteversión <b id="anteversionValue">15°</b></label>
+      <input id="anteversion" type="range" min="0" max="35" value="15" step="1" />
+    </div>
+
+    <div class="sliderBlock">
+      <label for="offset">Offset femoral <b id="offsetValue">0 mm</b></label>
+      <input id="offset" type="range" min="-14" max="14" value="0" step="1" />
+    </div>
+
+    <div class="sliderBlock">
+      <label for="neck">Longitud cuello <b id="neckValue">0 mm</b></label>
+      <input id="neck" type="range" min="-8" max="12" value="0" step="1" />
+    </div>
+
+    <div class="sliderBlock">
+      <label for="boneOpacity">Opacidad hueso <b id="boneOpacityValue">100%</b></label>
+      <input id="boneOpacity" type="range" min="18" max="100" value="100" step="2" />
+    </div>
+
+    <section class="metrics">
+      <div>
+        <b id="safeMetric">Zona segura</b>
+        <span>Cotilo</span>
+      </div>
+      <div>
+        <b id="offsetMetric">0 mm</b>
+        <span>Offset</span>
+      </div>
+      <div>
+        <b id="legMetric">0 mm</b>
+        <span>Longitud</span>
+      </div>
+      <div>
+        <b id="versionMetric">15°</b>
+        <span>Versión</span>
+      </div>
+    </section>
+
+    <section class="legend">
+      <h3>Colores</h3>
+      <p><i class="dot bone"></i> Hueso cortical / esponjoso</p>
+      <p><i class="dot metal"></i> Metal protésico</p>
+      <p><i class="dot liner"></i> Liner / cabeza</p>
+      <p><i class="dot axis"></i> Ejes y referencias</p>
+    </section>
   </aside>
 
-  <div id="label"></div>
+  <div id="labelLayer"></div>
   <div id="toast"></div>
 
-  <nav id="controls" class="glass">
-    <button class="blue" data-action="implant">Implante</button>
-    <button data-action="bones">Hueso</button>
-    <button data-action="xray">Rx</button>
-    <button data-action="labels">Puntos</button>
-    <button data-view="front">Frente</button>
+  <nav id="controls" class="glass" aria-label="Controles del modelo">
+    <button class="primary" data-toggle="implant">Implante</button>
+    <button data-toggle="bones">Hueso</button>
+    <button data-toggle="xray">Modo Rx</button>
+    <button data-toggle="labels">Etiquetas</button>
+    <button data-toggle="axes">Ejes</button>
+    <button data-toggle="cut">Corte</button>
+    <button data-toggle="explode">Explodir</button>
+    <button data-toggle="motion">Movim.</button>
+    <button data-view="ap">AP</button>
     <button data-view="lateral">Lateral</button>
     <button data-view="axial">Axial</button>
-    <button class="green" data-action="reset">Reset</button>
-    <button class="orange" data-action="panel">Panel</button>
-    <button class="red" data-action="test">Probar JS</button>
+    <button data-view="oblique">Oblicua</button>
+    <button class="success" data-action="reset">Reset</button>
+    <button class="warningBtn" data-action="panel">Panel</button>
+    <button class="danger" data-action="test">Probar JS</button>
   </nav>
 
   <script type="module" src="app.js"></script>
