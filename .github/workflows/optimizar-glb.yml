@@ -1,0 +1,38 @@
+name: Optimizar GLB
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'medical-3d-pipeline/input/modelo.glb'
+      - '.github/workflows/optimizar-glb.yml'
+      - 'medical-3d-pipeline/optimizar-glb.sh'
+
+jobs:
+  optimizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar herramientas
+        run: |
+          npm install -g @gltf-transform/cli gltfpack
+
+      - name: Dar permisos
+        run: chmod +x medical-3d-pipeline/optimizar-glb.sh
+
+      - name: Optimizar modelo
+        run: ./medical-3d-pipeline/optimizar-glb.sh medical-3d-pipeline/input/modelo.glb
+
+      - name: Subir resultado
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimized-glb
+          path: medical-3d-pipeline/output/modelo_final.glb
