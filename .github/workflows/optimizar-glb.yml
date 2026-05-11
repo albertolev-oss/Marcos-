@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - 'medical-3d-pipeline/input/rodilla_demo_medical.glb'
       - 'medical-3d-pipeline/input/modelo.gltf'
       - 'medical-3d-pipeline/input/modelo.glb'
       - '.github/workflows/optimizar-glb.yml'
@@ -30,7 +31,7 @@ jobs:
         run: chmod +x medical-3d-pipeline/optimizar-glb.sh
 
       - name: Optimizar modelo
-        run: ./medical-3d-pipeline/optimizar-glb.sh medical-3d-pipeline/input/modelo.gltf
+        run: ./medical-3d-pipeline/optimizar-glb.sh medical-3d-pipeline/input/rodilla_demo_medical.glb
 
       - name: Subir resultado
         uses: actions/upload-artifact@v4
