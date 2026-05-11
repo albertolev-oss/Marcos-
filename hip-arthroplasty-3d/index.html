@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#050b16" />
-  <meta name="description" content="Modelo educativo 3D de artroplastia total de cadera para traumatología." />
-  <title>Cadera 3D Pro · Artroplastia Total</title>
+  <meta name="description" content="Modelo educativo 3D y modo navegación de artroplastia total de cadera." />
+  <title>Cadera 3D Pro · Navegación</title>
   <link rel="stylesheet" href="styles.css" />
   <script type="importmap">
   {
@@ -21,15 +21,15 @@
 
   <div id="loader" class="loader">
     <div class="spinner"></div>
-    <strong>Cargando modelo 3D…</strong>
-    <small>Si no carga, tocá “Probar JS” cuando aparezca la interfaz.</small>
+    <strong>Cargando visor 3D…</strong>
+    <small>Modo navegación quirúrgica educativo. No usar como navegador real.</small>
   </div>
 
   <header id="topbar" class="glass">
     <div class="brand">
-      <span class="eyebrow">Traumatología · Educación médica</span>
+      <span class="eyebrow">Traumatología · Navegación educativa</span>
       <h1>Cadera 3D Pro</h1>
-      <p>Artroplastia total de cadera con cotilo, liner, cabeza, cuello y vástago.</p>
+      <p id="subtitle">Cargá un OBJ/STL real del paciente o usá el modelo demostrativo.</p>
     </div>
     <div class="statusBox">
       <span id="status" class="status pending">iniciando</span>
@@ -40,14 +40,14 @@
   <aside id="panel" class="glass">
     <div class="panelHead">
       <div>
-        <span class="eyebrow">Planificación conceptual</span>
-        <h2>Parámetros</h2>
+        <span class="eyebrow">Navegación quirúrgica educativa</span>
+        <h2>Plan vs actual</h2>
       </div>
       <button class="iconButton" id="closePanel" aria-label="Cerrar panel">×</button>
     </div>
 
     <p class="warning">
-      Modelo didáctico aproximado. No reemplaza radiografías calibradas, TC, navegación ni planificación quirúrgica.
+      Uso educativo / prototipo. No reemplaza navegación certificada, planificación quirúrgica, TAC calibrada ni medición clínica.
     </p>
 
     <div class="sliderBlock">
@@ -76,49 +76,38 @@
     </div>
 
     <section class="metrics">
-      <div>
-        <b id="safeMetric">Zona segura</b>
-        <span>Cotilo</span>
-      </div>
-      <div>
-        <b id="offsetMetric">0 mm</b>
-        <span>Offset</span>
-      </div>
-      <div>
-        <b id="legMetric">0 mm</b>
-        <span>Longitud</span>
-      </div>
-      <div>
-        <b id="versionMetric">15°</b>
-        <span>Versión</span>
-      </div>
+      <div><b id="safeMetric">Zona segura</b><span>Cotilo</span></div>
+      <div><b id="offsetMetric">0 mm</b><span>Offset</span></div>
+      <div><b id="legMetric">0 mm</b><span>Longitud</span></div>
+      <div><b id="versionMetric">15°</b><span>Versión</span></div>
     </section>
 
     <section class="legend">
-      <h3>Colores</h3>
-      <p><i class="dot bone"></i> Hueso cortical / esponjoso</p>
-      <p><i class="dot metal"></i> Metal protésico</p>
-      <p><i class="dot liner"></i> Liner / cabeza</p>
-      <p><i class="dot axis"></i> Ejes y referencias</p>
+      <h3>Modo real</h3>
+      <p>El botón <b>Cargar real</b> abre un modelo OBJ/STL local desde tu iPhone. El archivo no se sube a GitHub.</p>
+      <p><i class="dot bone"></i> Hueso real / demostrativo</p>
+      <p><i class="dot metal"></i> Implante simulado</p>
+      <p><i class="dot axis"></i> Ejes de navegación</p>
     </section>
   </aside>
 
+  <input id="modelInput" type="file" accept=".obj,.stl" hidden />
   <div id="labelLayer"></div>
   <div id="toast"></div>
 
   <nav id="controls" class="glass" aria-label="Controles del modelo">
-    <button class="primary" data-toggle="implant">Implante</button>
+    <button class="primary" data-action="load">Cargar real</button>
+    <button data-toggle="navigation">Navegación</button>
+    <button data-toggle="implant">Implante</button>
     <button data-toggle="bones">Hueso</button>
     <button data-toggle="xray">Modo Rx</button>
     <button data-toggle="labels">Etiquetas</button>
     <button data-toggle="axes">Ejes</button>
     <button data-toggle="cut">Corte</button>
     <button data-toggle="explode">Explodir</button>
-    <button data-toggle="motion">Movim.</button>
     <button data-view="ap">AP</button>
     <button data-view="lateral">Lateral</button>
     <button data-view="axial">Axial</button>
-    <button data-view="oblique">Oblicua</button>
     <button class="success" data-action="reset">Reset</button>
     <button class="warningBtn" data-action="panel">Panel</button>
     <button class="danger" data-action="test">Probar JS</button>
