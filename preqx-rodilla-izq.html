@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Planificación PreQx · Rodilla Izquierda</title>
+  <style>
+    :root{--bg:#07111f;--card:rgba(8,15,28,.92);--text:#f8fafc;--muted:#9fb0c7;--blue:#2563eb;--green:#16a34a;--gray:#334155;--border:rgba(255,255,255,.14)}
+    *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+    .wrap{max-width:920px;margin:20px auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+    h1{margin:0 0 6px;font-size:24px} p{color:var(--muted);margin:4px 0 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px} @media(max-width:700px){.grid{grid-template-columns:1fr}}
+    label{display:block;font-size:12px;font-weight:700;color:#cbd5e1;margin-bottom:6px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#050b18;color:#fff}
+    textarea{min-height:90px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{border:0;border-radius:10px;padding:10px 14px;color:#fff;background:var(--gray);font-weight:700;cursor:pointer}
+    .blue{background:var(--blue)} .green{background:var(--green)}
+    pre{white-space:pre-wrap;background:#020617;border:1px solid var(--border);padding:12px;border-radius:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Programa de planificación preqx de rodilla izquierda</h1>
+      <p>Herramienta educativa para organizar parámetros preoperatorios. No reemplaza juicio clínico.</p>
+    </div>
+
+    <div class="card grid">
+      <div><label>Paciente</label><input id="paciente" placeholder="Nombre o ID"></div>
+      <div><label>Fecha cirugía</label><input id="fecha" type="date"></div>
+      <div><label>Lado</label><select id="lado"><option selected>Izquierda</option><option>Derecha</option></select></div>
+      <div><label>Diagnóstico</label><input id="dx" placeholder="Ej: Gonartrosis medial"></div>
+      <div><label>Deformidad preop (°)</label><input id="deformidad" type="number" value="0"></div>
+      <div><label>Slope tibial planeado (°)</label><input id="slope" type="number" value="3"></div>
+      <div><label>Objetivo HKA (°)</label><input id="hka" type="number" value="180"></div>
+      <div><label>Restricción protésica</label><select id="restric"><option>CR/PS según balance</option><option>CR</option><option>PS</option><option>Constrained</option></select></div>
+    </div>
+
+    <div class="card">
+      <label>Notas de planificación</label>
+      <textarea id="notas" placeholder="ROM, gaps, liberaciones, tamaños estimados, riesgos..."></textarea>
+      <div class="actions">
+        <button class="blue" onclick="generarPlan()">Generar plan</button>
+        <button onclick="guardar()">Guardar local</button>
+        <button onclick="cargar()">Cargar</button>
+        <button class="green" onclick="copiar()">Copiar texto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Salida</label>
+      <pre id="salida">Aquí aparecerá el resumen.</pre>
+    </div>
+  </div>
+
+<script>
+function plan(){
+  return [
+    'PLAN PREQX RODILLA',
+    'Paciente: ' + v('paciente'),
+    'Fecha cirugía: ' + v('fecha'),
+    'Lado: ' + v('lado'),
+    'Diagnóstico: ' + v('dx'),
+    'Deformidad preop: ' + v('deformidad') + '°',
+    'Slope tibial: ' + v('slope') + '°',
+    'Objetivo HKA: ' + v('hka') + '°',
+    'Restricción: ' + v('restric'),
+    'Notas: ' + v('notas'),
+    '',
+    'Aviso: uso educativo, no sustituye planificación quirúrgica real.'
+  ].join('\n');
+}
+function v(id){ return document.getElementById(id).value || '-'; }
+function generarPlan(){ document.getElementById('salida').textContent = plan(); }
+function guardar(){
+  const data = ['paciente','fecha','lado','dx','deformidad','slope','hka','restric','notas']
+    .reduce((acc,k)=>{acc[k]=v(k);return acc;},{});
+  localStorage.setItem('planPreQxRodillaIzq', JSON.stringify(data));
+  generarPlan();
+}
+function cargar(){
+  const raw = localStorage.getItem('planPreQxRodillaIzq');
+  if(!raw) return;
+  const data = JSON.parse(raw);
+  Object.keys(data).forEach(k=>{ const el=document.getElementById(k); if(el) el.value=data[k]; });
+  generarPlan();
+}
+async function copiar(){
+  generarPlan();
+  try{ await navigator.clipboard.writeText(document.getElementById('salida').textContent); }
+  catch(e){}
+}
+generarPlan();
+</script>
+</body>
+</html>
