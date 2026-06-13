@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06101f">
+<title>Conector PACS · FCM UNC</title>
+<style>
+:root{--bg:#06101f;--card:rgba(15,23,42,.95);--card2:#050b18;--txt:#f8fafc;--mut:#9fb0c7;--blue:#2563eb;--green:#16a34a;--orange:#ea580c;--red:#dc2626;--gray:#334155;--line:rgba(255,255,255,.14);--cyan:#06b6d4}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at top,rgba(37,99,235,.30),transparent 38%),var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif}.app{max-width:1120px;margin:auto;padding:14px 14px 32px}.hero,.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.35);margin-bottom:13px}.top{display:flex;align-items:center;gap:12px}.icon{width:56px;height:56px;border-radius:18px;background:linear-gradient(180deg,#2563eb,#0b4f9c);display:grid;place-items:center;font-size:29px}.title{flex:1}.title h1{margin:0;font-size:28px;letter-spacing:-.03em}.title p{margin:4px 0 0;color:var(--mut);line-height:1.35}.pill{display:inline-block;margin-top:10px;padding:7px 10px;border-radius:999px;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.38);color:#bbf7d0;font-size:13px;font-weight:900}.warn{background:rgba(234,88,12,.15);border:1px solid rgba(234,88,12,.35);border-radius:14px;padding:10px;color:#fed7aa;font-size:13px;line-height:1.35;margin-top:10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}label{display:block;margin:10px 0 6px;color:#cbd5e1;font-weight:900;font-size:12px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:15px;background:var(--card2);color:white;padding:12px;font-size:14px;outline:none}textarea{min-height:112px;resize:vertical}button,a.btn{border:0;border-radius:15px;background:var(--gray);color:white;font-weight:900;padding:12px 13px;min-height:44px;font-size:14px;text-decoration:none;text-align:center;display:inline-grid;place-items:center;cursor:pointer}button:active,a.btn:active{transform:scale(.98)}.blue{background:var(--blue)}.green{background:var(--green)}.orange{background:var(--orange)}.red{background:var(--red)}.cyan{background:var(--cyan)}.out{white-space:pre-wrap;background:#020817;border:1px solid var(--line);border-radius:16px;padding:14px;color:#dbeafe;min-height:188px;line-height:1.45;overflow:auto}.small{font-size:13px;color:var(--mut);line-height:1.35}.sectionTitle{margin:0 0 10px;font-size:18px;font-weight:950}.status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tile{background:#020817;border:1px solid var(--line);border-radius:16px;padding:11px}.tile b{display:block;font-size:16px}.tile small{color:var(--mut)}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:rgba(0,0,0,.84);border:1px solid var(--line);border-radius:999px;padding:9px 14px;display:none;white-space:nowrap}.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(37,99,235,.2);border:1px solid rgba(37,99,235,.35);color:#bfdbfe;font-size:12px;font-weight:900;margin:3px 4px 3px 0}.ok{color:#bbf7d0}.bad{color:#fecaca}@media(max-width:860px){.grid,.three,.two,.status{grid-template-columns:1fr}.title h1{font-size:25px}.app{padding:10px 10px 24px}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero">
+  <div class="top"><div class="icon">🩻</div><div class="title"><h1>Conector PACS · FCM UNC</h1><p>Puente local para abrir, buscar y copiar parámetros de conexión hacia <b>pacs.fcm.unc.edu.ar</b>.</p></div></div>
+  <span class="pill" id="connectionPill">Conector listo</span>
+  <div class="warn">Este módulo no guarda imágenes ni credenciales. Abre el PACS en una pestaña segura y prepara enlaces/configuración. El acceso clínico depende de usuario institucional, red/VPN y permisos del servidor PACS.</div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="sectionTitle">Configuración del servidor</div>
+    <label>Host PACS</label>
+    <input id="host" value="pacs.fcm.unc.edu.ar" oninput="refresh()" autocapitalize="none" spellcheck="false">
+    <div class="three">
+      <div><label>Protocolo</label><select id="protocol" onchange="refresh()"><option value="https">https</option><option value="http">http</option></select></div>
+      <div><label>Ruta web</label><input id="webPath" value="/" oninput="refresh()"></div>
+      <div><label>Ruta DICOMweb</label><input id="dicomPath" value="/dicom-web" oninput="refresh()"></div>
+    </div>
+    <div class="two" style="margin-top:10px">
+      <button class="green" onclick="openPacs()">Abrir PACS</button>
+      <button class="blue" onclick="copyConfig()">Copiar config</button>
+    </div>
+    <p class="small">Si recibiste el dominio como <b>pacs,fcm.unc.edu.ar</b>, el conector lo normaliza automáticamente a <b>pacs.fcm.unc.edu.ar</b>.</p>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle">Estado del puente</div>
+    <div class="status">
+      <div class="tile"><b id="stHost">—</b><small>Host</small></div>
+      <div class="tile"><b id="stWeb">—</b><small>Web</small></div>
+      <div class="tile"><b id="stQido">—</b><small>QIDO</small></div>
+      <div class="tile"><b id="stWado">—</b><small>WADO</small></div>
+    </div>
+    <div class="two" style="margin-top:10px">
+      <button class="cyan" onclick="healthCheck()">Probar alcance</button>
+      <button onclick="saveLocal()">Guardar local</button>
+    </div>
+    <p class="small" id="healthNote">La prueba usa una petición web simple; si hay CORS, login o VPN puede avisar “bloqueado” aunque el PACS funcione al abrirlo.</p>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="sectionTitle">Búsqueda rápida de estudio</div>
+    <div class="three">
+      <div><label>Paciente / ID</label><input id="patient" placeholder="DNI, HC o apellido" oninput="refresh()"></div>
+      <div><label>Accession Nº</label><input id="accession" placeholder="Accession" oninput="refresh()"></div>
+      <div><label>Fecha estudio</label><input id="studyDate" type="date" oninput="refresh()"></div>
+    </div>
+    <label>Modalidad</label>
+    <select id="modality" onchange="refresh()"><option value="">Todas</option><option>CR</option><option>DX</option><option>CT</option><option>MR</option><option>US</option><option>XA</option></select>
+    <div class="three" style="margin-top:10px">
+      <button class="green" onclick="openSearch()">Abrir búsqueda</button>
+      <button class="blue" onclick="copySearch()">Copiar link</button>
+      <button onclick="clearStudy()">Limpiar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle">Salida del conector</div>
+    <div id="badges"></div>
+    <div id="output" class="out">Configurar datos para generar enlaces.</div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="sectionTitle">Cómo unirlo a un visor/servidor local</div>
+  <p class="small">Para integración real DICOMweb, usá estas bases desde un backend/proxy autorizado; desde GitHub Pages no se deben exponer tokens ni credenciales.</p>
+  <textarea id="snippet" readonly></textarea>
+  <div class="three" style="margin-top:10px">
+    <button class="blue" onclick="copySnippet()">Copiar snippet</button>
+    <button onclick="location.href='daily.html'">Agente diario</button>
+    <button onclick="location.href='index.html'">Rodilla 3D</button>
+  </div>
+</section>
+</main>
+<div id="toast" class="toast"></div>
+<script>
+const $=id=>document.getElementById(id),toast=$('toast');
+const storeKey='marcosPacsConnector';
+function msg(t){toast.textContent=t;toast.style.display='block';clearTimeout(msg.t);msg.t=setTimeout(()=>toast.style.display='none',1500)}
+function enc(s){return encodeURIComponent(s||'')}
+function cleanPath(p){p=(p||'/').trim();if(!p.startsWith('/'))p='/'+p;return p}
+function cleanHost(h){return (h||'pacs.fcm.unc.edu.ar').trim().replace(/^https?:\/\//,'').replace(/\/.*$/,'').replace(/,/g,'.')}
+function cfg(){return {protocol:$('protocol').value,host:cleanHost($('host').value),webPath:cleanPath($('webPath').value),dicomPath:cleanPath($('dicomPath').value),patient:$('patient').value.trim(),accession:$('accession').value.trim(),studyDate:$('studyDate').value,modality:$('modality').value}}
+function base(){const c=cfg();return c.protocol+'://'+c.host}
+function webUrl(){const c=cfg();return base()+c.webPath}
+function qidoUrl(){return base()+cfg().dicomPath+'/studies'}
+function wadoUrl(){return base()+cfg().dicomPath+'/studies/{StudyInstanceUID}'}
+function searchParams(){const c=cfg(),p=new URLSearchParams();if(c.patient)p.set('patient',c.patient);if(c.accession)p.set('accession',c.accession);if(c.studyDate)p.set('date',c.studyDate.replaceAll('-',''));if(c.modality)p.set('modality',c.modality);return p.toString()}
+function searchUrl(){const qs=searchParams();return webUrl()+(qs?(webUrl().includes('?')?'&':'?')+qs:'')}
+function dicomConfig(){return {name:'PACS FCM UNC',web:webUrl(),qidoRoot:qidoUrl(),wadoRoot:wadoUrl(),stowRoot:base()+cfg().dicomPath+'/studies',host:cfg().host,note:'Usar desde backend/proxy con autorización institucional; no guardar credenciales en frontend.'}}
+function refresh(){const c=cfg();$('host').value=c.host;$('webPath').value=c.webPath;$('dicomPath').value=c.dicomPath;$('stHost').textContent=c.host;$('stWeb').textContent=webUrl();$('stQido').textContent='QIDO';$('stWado').textContent='WADO';$('badges').innerHTML=['Web: '+webUrl(),'QIDO: '+qidoUrl(),'WADO: '+wadoUrl()].map(x=>'<span class="badge">'+x+'</span>').join('');$('output').textContent=JSON.stringify({open:webUrl(),search:searchUrl(),dicomweb:dicomConfig()},null,2);$('snippet').value=`// Configuración sugerida para backend/proxy autorizado\nconst PACS_FCM_UNC = ${JSON.stringify(dicomConfig(),null,2)};\n\n// Ejemplo QIDO-RS: GET ${qidoUrl()}?PatientID=...&AccessionNumber=...\n// Ejemplo WADO-RS: GET ${wadoUrl()}/series/{SeriesInstanceUID}/instances`;localStorage.setItem(storeKey,JSON.stringify(c))}
+function openPacs(){window.open(webUrl(),'_blank','noopener');msg('Abriendo PACS')}
+function openSearch(){window.open(searchUrl(),'_blank','noopener');msg('Abriendo búsqueda')}
+async function copyText(t){try{await navigator.clipboard.writeText(t);msg('Copiado')}catch{msg('No pude copiar')}}
+function copyConfig(){copyText(JSON.stringify(dicomConfig(),null,2))}
+function copySearch(){copyText(searchUrl())}
+function copySnippet(){copyText($('snippet').value)}
+function saveLocal(){localStorage.setItem(storeKey,JSON.stringify(cfg()));msg('Configuración guardada')}
+function clearStudy(){$('patient').value='';$('accession').value='';$('studyDate').value='';$('modality').value='';refresh();msg('Búsqueda limpia')}
+async function healthCheck(){const url=webUrl();$('connectionPill').textContent='Probando...';try{await fetch(url,{mode:'no-cors',cache:'no-store'});$('connectionPill').textContent='Solicitud enviada';$('connectionPill').className='pill';$('healthNote').innerHTML='<span class="ok">Solicitud enviada.</span> Si el navegador abrió sesión o la red responde, continuá en “Abrir PACS”.';}catch(e){$('connectionPill').textContent='Bloqueado o sin red';$('healthNote').innerHTML='<span class="bad">No se pudo alcanzar desde esta página.</span> Verificá VPN/red institucional o abrí el PACS directamente.';} }
+function load(){try{const raw=localStorage.getItem(storeKey);if(raw){const c=JSON.parse(raw);$('protocol').value=c.protocol||'https';$('host').value=c.host||'pacs.fcm.unc.edu.ar';$('webPath').value=c.webPath||'/';$('dicomPath').value=c.dicomPath||'/dicom-web';$('patient').value=c.patient||'';$('accession').value=c.accession||'';$('studyDate').value=c.studyDate||'';$('modality').value=c.modality||''}}catch{}refresh()}
+load();
+</script>
+</body>
+</html>
