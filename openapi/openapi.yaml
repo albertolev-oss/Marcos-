@@ -1,0 +1,79 @@
+openapi: 3.1.0
+info:
+  title: PACS VisualMedica ChatGPT Pro
+  version: 3.0.0
+  description: API segura para consultar el último estudio PACS y capturar el visor sin descargar estudios.
+servers:
+  - url: https://TU-DOMINIO.example
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      operationId: healthcheck
+      security: []
+      responses:
+        '200': { description: Servicio configurado }
+        '503': { description: Faltan variables de entorno }
+  /v1/ultimo-estudio:
+    post:
+      operationId: ultimoEstudioPacs
+      summary: Busca y abre el último estudio PACS de un paciente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patient]
+              properties:
+                patient: { type: string, description: Apellido y nombre o identificador del paciente }
+                index: { type: integer, minimum: 0, default: 0 }
+      responses:
+        '200':
+          description: Estudio encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StudySummary' }
+  /v1/capturar-visor:
+    post:
+      operationId: capturarVisorPacs
+      summary: Captura el visor del estudio seleccionado en artifacts/.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patient]
+              properties:
+                patient: { type: string }
+                index: { type: integer, minimum: 0, default: 0 }
+      responses:
+        '200':
+          description: Captura creada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StudySummary' }
+  /v1/discover:
+    post:
+      operationId: discoverVisualMedica
+      summary: Detecta endpoints internos candidatos para una futura integración sin clicks.
+      responses:
+        '200':
+          description: Candidatos detectados
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    StudySummary:
+      type: object
+      properties:
+        patientQuery: { type: string }
+        index: { type: integer }
+        title: { type: string }
+        url: { type: string }
+        capturedAt: { type: string, format: date-time }
+        screenshotPath: { type: string }
