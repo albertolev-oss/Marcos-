@@ -1,0 +1,22 @@
+{
+  "name": "pacs-chatgpt-visualmedica-pro",
+  "version": "3.0.0",
+  "description": "Conector MCP/API para consultar el ultimo estudio PACS VisualMedica con logs enmascarados.",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node --check src/*.js",
+    "healthcheck": "node src/cli.js healthcheck",
+    "last": "node src/cli.js last",
+    "capture": "node src/cli.js capture",
+    "discover": "node src/cli.js discover",
+    "api": "node src/http.js",
+    "mcp": "node src/mcp.js",
+    "selftest": "node src/selftest.js"
+  },
+  "dependencies": {
+    "playwright": "^1.44.0"
+  }
+}
