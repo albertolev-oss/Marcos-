@@ -1,0 +1,17 @@
+{
+  "name": "sihosp-remote-browser-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Navegador Chromium remoto de demostración con modo clínico de solo lectura",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test",
+    "check": "node --check src/server.js && node --check src/policy.js"
+  },
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "express": "4.21.2",
+    "playwright-core": "1.52.0"
+  }
+}
