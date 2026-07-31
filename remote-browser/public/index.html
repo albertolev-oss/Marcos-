@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071a2b"><link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css"><title>Navegador clínico — Demo</title>
+</head>
+<body>
+  <header><div><strong>Demo · datos ficticios</strong><span id="mode">Inicio manual</span></div><button id="install" hidden>Instalar</button></header>
+  <main>
+    <section class="notice"><b>Privacidad:</b> ingresá usuario, contraseña, OTP y CAPTCHA solo dentro del escritorio remoto. La aplicación no solicita ni almacena esas credenciales.</section>
+    <section class="controls">
+      <button id="back">←</button><button id="forward">→</button><button id="reload">↻</button>
+      <input id="url" inputmode="url" placeholder="https://demo.local/"><button id="go">Ir</button>
+      <button id="lock" class="primary">Activar modo lectura</button>
+    </section>
+    <section class="desktop" id="desktop"><iframe title="Escritorio Chromium remoto" src="/novnc/vnc.html?autoconnect=true&resize=scale&path=novnc/websockify"></iframe><div class="shield" id="shield"><p>Modo lectura activo</p></div></section>
+    <section class="reader"><div><input id="query" placeholder="Buscar texto"><button id="find">Buscar</button><button id="read">Leer página</button></div><pre id="output">Conectate al escritorio e iniciá sesión manualmente. Luego activá el modo lectura.</pre></section>
+  </main><script src="/app.js"></script>
+</body></html>
