@@ -29,9 +29,6 @@ label{display:block;font-size:12px;color:#cbd5e1;font-weight:900;margin:10px 0 6
 </aside>
 <div id="controls" class="glass"><div class="grid"><button class="orange" onclick="togglePanel()">Panel</button><button class="blue" onclick="prevStep()">◀</button><button class="blue" onclick="nextStep()">▶</button><button onclick="toggleFlex()">Flex/ext</button><button onclick="toggle('prosthesis')">Prótesis</button><button onclick="toggle('axis')">Eje</button><button onclick="toggle('cuts')">Cortes</button><button onclick="toggle('ligaments')">Lig.</button><button onclick="toggle('menisci')">Meniscos</button><button onclick="toggle('hotspots')">Puntos</button><button class="green" onclick="resetCamera()">Reset</button><button onclick="view('front')">Frente</button></div></div>
 <script type="module">
-import * as THREE from 'three';import{OrbitControls}from'tree/addons/controls/OrbitControls.js';
-</script>
-<script type="module">
 import * as THREE from 'three';import{OrbitControls}from'three/addons/controls/OrbitControls.js';
 const $=id=>document.getElementById(id),canvas=$('viewer'),status=$('status'),label=$('label3d'),toast=$('toast');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x07111f);const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.01,100);camera.position.set(1.65,1.15,3.2);const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,.15,0);controls.minDistance=1.05;controls.maxDistance=7;
