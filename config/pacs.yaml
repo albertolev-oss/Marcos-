@@ -1,0 +1,9 @@
+name: PACS FCM UNC
+vendor: VisualMedica
+baseUrl: https://pacs.fcm.unc.edu.ar
+webPath: /
+dicomWebPath: /dicom-web
+security:
+  storesCredentials: false
+  requiresInstitutionalAccess: true
+  note: No credentials or tokens are committed. Configure secrets in Railway environment variables only.

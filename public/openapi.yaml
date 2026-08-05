@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  title: PACS FCM UNC Connector
+  version: 1.0.0
+  description: Read-only connector that builds VisualMedica PACS web and DICOMweb study lookup URLs for Railway and ChatGPT Actions.
+servers:
+  - url: /
+security:
+  - ApiKeyAuth: []
+paths:
+  /health:
+    get:
+      security: []
+      operationId: health
+      summary: Check connector status
+      responses:
+        '200':
+          description: Connector status and current PACS configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  service:
+                    type: string
+                  time:
+                    type: string
+                  config:
+                    $ref: '#/components/schemas/ConnectorConfig'
+  /config:
+    get:
+      operationId: getConfig
+      summary: Return current PACS connector configuration
+      responses:
+        '200':
+          description: PACS connector configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  config:
+                    $ref: '#/components/schemas/ConnectorConfig'
+  /study-link:
+    post:
+      operationId: buildStudyLink
+      summary: Build PACS web and DICOMweb lookup links for a study
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudyLookup'
+      responses:
+        '200':
+          description: Constructed links
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  input:
+                    $ref: '#/components/schemas/StudyLookup'
+                  webUrl:
+                    type: string
+                  qidoUrl:
+                    type: string
+                  dicomweb:
+                    type: object
+  /search:
+    post:
+      operationId: searchStudies
+      summary: Build links and optionally proxy a read-only study search
+      description: If PACS_PROXY_BASE_URL is not configured, this returns constructed links only. If configured, it forwards a read-only request to the authorized proxy.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudyLookup'
+      responses:
+        '200':
+          description: Search links and optional proxy result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  input:
+                    $ref: '#/components/schemas/StudyLookup'
+                  webUrl:
+                    type: string
+                  qidoUrl:
+                    type: string
+                  proxy:
+                    type: object
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    ConnectorConfig:
+      type: object
+      properties:
+        name:
+          type: string
+        vendor:
+          type: string
+        baseUrl:
+          type: string
+        webUrl:
+          type: string
+        webPath:
+          type: string
+        dicomWebPath:
+          type: string
+        dicomweb:
+          type: object
+          properties:
+            qidoRoot:
+              type: string
+            wadoRoot:
+              type: string
+            stowRoot:
+              type: string
+        proxy:
+          type: object
+          properties:
+            configured:
+              type: boolean
+            baseUrl:
+              type:
+                - string
+                - 'null'
+    StudyLookup:
+      type: object
+      properties:
+        patient:
+          type: string
+          description: Patient ID, clinical record number, DNI, or patient search text supported by the PACS/proxy.
+        patientId:
+          type: string
+        accession:
+          type: string
+        accessionNumber:
+          type: string
+        studyDate:
+          type: string
+          description: Study date as YYYY-MM-DD or YYYYMMDD.
+        modality:
+          type: string
+          description: Modality such as CR, DX, CT, MR, US, or XA.
