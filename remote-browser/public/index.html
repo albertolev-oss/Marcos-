@@ -3,18 +3,28 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#071a2b"><link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/styles.css"><title>Navegador clínico — Demo</title>
+  <link rel="stylesheet" href="/styles.css"><title>Navegador de solo lectura</title>
 </head>
 <body>
-  <header><div><strong>Demo · datos ficticios</strong><span id="mode">Inicio manual</span></div><button id="install" hidden>Instalar</button></header>
+  <header><div><strong id="header-brand">Navegador de solo lectura</strong><span id="mode">Verificando estado</span></div><button id="install" hidden>Instalar</button></header>
   <main>
-    <section class="notice"><b>Privacidad:</b> ingresá usuario, contraseña, OTP y CAPTCHA solo dentro del escritorio remoto. La aplicación no solicita ni almacena esas credenciales.</section>
-    <section class="controls">
-      <button id="back">←</button><button id="forward">→</button><button id="reload">↻</button>
-      <input id="url" inputmode="url" placeholder="https://demo.local/"><button id="go">Ir</button>
-      <button id="lock" class="primary">Activar modo lectura</button>
+    <section class="notice" id="notice-message">Cargando configuración del navegador…</section>
+    <section class="targets" id="demo-targets" aria-label="Portales sintéticos" hidden><div><button id="demo-sihosp" disabled>SIHOSP demo</button><button id="demo-pacs" disabled>PACS demo</button></div></section>
+    <p id="target-info" hidden>Origen permitido: <code id="target-origin"></code></p>
+    <section class="controls" aria-label="Acciones de solo lectura">
+      <button id="status" disabled>Estado</button><button id="back" aria-label="Atrás" disabled hidden>←</button><button id="forward" aria-label="Adelante" disabled hidden>→</button><button id="reload" aria-label="Recargar" disabled hidden>↻</button>
+      <input id="url" inputmode="url" aria-label="URL de demostración" placeholder="URL del origen de demostración" hidden><button id="go" disabled hidden>Ir</button>
+      <button id="lock" class="primary" disabled>Activar modo lectura</button>
     </section>
-    <section class="desktop" id="desktop"><iframe title="Escritorio Chromium remoto" src="/novnc/vnc.html?autoconnect=true&resize=scale&path=novnc/websockify"></iframe><div class="shield" id="shield"><p>Modo lectura activo</p></div></section>
-    <section class="reader"><div><input id="query" placeholder="Buscar texto"><button id="find">Buscar</button><button id="read">Leer página</button></div><pre id="output">Conectate al escritorio e iniciá sesión manualmente. Luego activá el modo lectura.</pre></section>
+    <section class="desktop" id="desktop"><iframe id="desktop-frame" inert tabindex="-1" title="Escritorio Chromium remoto para login manual" src="/novnc/vnc.html?autoconnect=true&amp;resize=scale&amp;path=novnc/websockify"></iframe><div class="shield active" id="shield"><p id="shield-message">Verificando estado del navegador…</p></div></section>
+    <section class="reader"><div><input id="query" aria-label="Texto a buscar" placeholder="Buscar texto" autocomplete="off" disabled><button id="find" disabled>Buscar</button><button id="read" disabled>Leer página</button></div></section>
+    <section class="agent-panel" aria-labelledby="agent-title">
+      <h1 id="agent-title">Lectura asistida</h1>
+      <p id="agent-description">Consultando las acciones disponibles…</p>
+      <p id="pacs-limitation" hidden>En PACS se lee solo el texto de la página. No se interpretan imágenes, radiografías ni archivos DICOM.</p>
+      <button id="agent-run" class="primary" disabled>Ejecutar agente</button><p id="agent-status" role="status">Consultando disponibilidad…</p>
+    </section>
+    <pre id="output" aria-live="polite">Consultando el estado del navegador…</pre>
+    <aside class="institutional" id="institutional-links" hidden><strong>Portales institucionales · acceso manual externo</strong><p>Estos enlaces abren el navegador de tu dispositivo. En este modo demo el agente no está conectado a los sistemas reales.</p><a id="institutional-sihosp" target="_blank" rel="noopener noreferrer" hidden>SIHOSP institucional ↗</a><a id="institutional-pacs" target="_blank" rel="noopener noreferrer" hidden>PACS institucional ↗</a></aside>
   </main><script src="/app.js"></script>
 </body></html>
