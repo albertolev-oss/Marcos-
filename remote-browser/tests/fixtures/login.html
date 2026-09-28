@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ingreso manual · demo sintética</title></head>
+<body>
+  <main>
+    <h1>Ingreso manual a la demo</h1>
+    <p>Solo datos sintéticos. Esta pantalla simula un login: no autentica usuarios ni crea sesiones reales.</p>
+    <p>Ingresá manualmente <strong>demo</strong> en ambos campos. No uses credenciales institucionales.</p>
+    <form method="get" action="/mock-sihosp.html" autocomplete="off">
+      <p><label>Usuario ficticio <input type="text" pattern="demo" required autocomplete="off" spellcheck="false" aria-describedby="credentials-note"></label></p>
+      <p><label>Clave ficticia <input type="password" pattern="demo" required autocomplete="off" aria-describedby="credentials-note"></label></p>
+      <p id="credentials-note">Los campos no tienen nombre y no se envían al servidor. Usá únicamente demo / demo.</p>
+      <button type="submit">Entrar manualmente a la demo</button>
+    </form>
+    <p>Después del ingreso manual, activá el modo lectura desde el panel del navegador.</p>
+  </main>
+</body>
+</html>

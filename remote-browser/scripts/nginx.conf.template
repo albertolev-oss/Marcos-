@@ -6,6 +6,6 @@ http {
     client_max_body_size 32k;
     location /novnc/websockify { proxy_pass http://127.0.0.1:6080/websockify; proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection "upgrade"; }
     location /novnc/ { proxy_pass http://127.0.0.1:6080/; }
-    location / { proxy_pass http://127.0.0.1:3000; proxy_http_version 1.1; proxy_set_header Host $host; }
+    location / { proxy_read_timeout 180s; proxy_pass http://127.0.0.1:3000; proxy_http_version 1.1; proxy_set_header Host $http_host; }
   }
 }

@@ -2,10 +2,13 @@ services:
   remote-browser:
     build: .
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       ALLOW_CLINICAL_WRITES: "false"
       PORT: "8080"
+      AGENTS_ENABLED: "${AGENTS_ENABLED:-false}"
+      AGENTS_MODEL: "${AGENTS_MODEL:-gpt-6-astra}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
       DEMO_ORIGIN: "http://mock-sihosp:8081"
     volumes:
       - chromium-profile:/data/chromium

@@ -3,18 +3,29 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#071a2b"><link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/styles.css"><title>Navegador clínico — Demo</title>
+  <link rel="stylesheet" href="/styles.css"><title>Navegador de solo lectura — Demo sintética</title>
 </head>
 <body>
-  <header><div><strong>Demo · datos ficticios</strong><span id="mode">Inicio manual</span></div><button id="install" hidden>Instalar</button></header>
+  <header><div><strong>SIHOSP + PACS · demo sintética</strong><span id="mode">Verificando estado</span></div><button id="install" hidden>Instalar</button></header>
   <main>
-    <section class="notice"><b>Privacidad:</b> ingresá usuario, contraseña, OTP y CAPTCHA solo dentro del escritorio remoto. La aplicación no solicita ni almacena esas credenciales.</section>
-    <section class="controls">
-      <button id="back">←</button><button id="forward">→</button><button id="reload">↻</button>
-      <input id="url" inputmode="url" placeholder="https://demo.local/"><button id="go">Ir</button>
-      <button id="lock" class="primary">Activar modo lectura</button>
+    <section class="notice"><b>Solo datos ficticios.</b> Iniciá sesión manualmente dentro del escritorio con el usuario y la clave ficticios indicados en la demo. No ingreses credenciales institucionales ni datos de pacientes. Después, activá el modo lectura.</section>
+    <section class="targets" aria-label="Portales sintéticos">
+      <div><button id="demo-sihosp" disabled>SIHOSP demo</button><button id="demo-pacs" disabled>PACS demo</button></div>
+      <p>Origen permitido: <code id="demo-origin">Verificando…</code></p>
     </section>
-    <section class="desktop" id="desktop"><iframe title="Escritorio Chromium remoto" src="/novnc/vnc.html?autoconnect=true&resize=scale&path=novnc/websockify"></iframe><div class="shield" id="shield"><p>Modo lectura activo</p></div></section>
-    <section class="reader"><div><input id="query" placeholder="Buscar texto"><button id="find">Buscar</button><button id="read">Leer página</button></div><pre id="output">Conectate al escritorio e iniciá sesión manualmente. Luego activá el modo lectura.</pre></section>
+    <section class="controls" aria-label="Acciones de solo lectura">
+      <button id="status" disabled>Estado</button><button id="back" aria-label="Atrás" disabled>←</button><button id="forward" aria-label="Adelante" disabled>→</button><button id="reload" aria-label="Recargar" disabled>↻</button>
+      <input id="url" inputmode="url" aria-label="URL de demostración" placeholder="URL del origen de demostración"><button id="go" disabled>Ir</button>
+      <button id="lock" class="primary" disabled>Activar modo lectura</button>
+    </section>
+    <section class="desktop" id="desktop"><iframe id="desktop-frame" inert tabindex="-1" title="Escritorio Chromium remoto para login manual" src="/novnc/vnc.html?autoconnect=true&amp;resize=scale&amp;path=novnc/websockify"></iframe><div class="shield active" id="shield"><p id="shield-message">Verificando estado del navegador…</p></div></section>
+    <section class="reader"><div><input id="query" aria-label="Texto sintético a buscar" placeholder="Buscar texto ficticio"><button id="find" disabled>Buscar</button><button id="read" disabled>Leer página</button></div></section>
+    <section class="agent-panel" aria-labelledby="agent-title">
+      <h1 id="agent-title">Prueba del agente</h1>
+      <p>Consigna fija: consultar los portales SIHOSP y PACS sintéticos y resumir el registro DEMO-0001. El agente dispone únicamente de status, navigate, back, forward, reload, find y read.</p>
+      <button id="agent-run" class="primary" disabled>Ejecutar prueba sintética</button><p id="agent-status" role="status">Consultando disponibilidad…</p>
+    </section>
+    <pre id="output" aria-live="polite">Conectate al escritorio e iniciá sesión con los datos ficticios de la demo. Luego activá el modo lectura.</pre>
+    <aside class="institutional"><strong>Portales institucionales · acceso manual externo</strong><p>Estos enlaces abren el navegador de tu dispositivo. El agente no está conectado a los sistemas reales.</p><a id="institutional-sihosp" target="_blank" rel="noopener noreferrer" hidden>SIHOSP institucional ↗</a><a id="institutional-pacs" target="_blank" rel="noopener noreferrer" hidden>PACS institucional ↗</a></aside>
   </main><script src="/app.js"></script>
 </body></html>
