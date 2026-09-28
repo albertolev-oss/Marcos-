@@ -37,3 +37,31 @@ test('config rechaza orígenes institucionales, no locales y credenciales', () =
   }
   for (const ALLOW_CLINICAL_WRITES of ['true', 'TRUE', 'False', '0', '']) assert.throws(() => loadConfig({ ALLOW_CLINICAL_WRITES }));
 });
+
+test('modo institucional expone solo captura actual y destinos exactos, sin relajar la demo', async t => {
+  const config = loadConfig({ BROWSER_MODE: 'sihosp' });
+  assert.equal(config.target.origin, 'https://sihosp.fcm.unc.edu.ar');
+  assert.equal(loadConfig({ BROWSER_MODE: 'pacs' }).startUrl, 'https://pacs.fcm.unc.edu.ar/viewer/index.php');
+  assert.throws(() => loadConfig({ BROWSER_MODE: 'other' }));
+  assert.equal(loadConfig({}).mode, 'demo');
+  assert.throws(() => loadConfig({ BROWSER_MODE: 'sihosp', DEMO_ORIGIN: 'https://sihosp.fcm.unc.edu.ar' }));
+  let locked = false;
+  const actions = {
+    isLocked: () => locked,
+    lock: async () => { locked = true; return { snapshotExpiresAt: 123456789, expired: false }; },
+    unlock: async () => { locked = false; },
+    execute: async action => ({ ok: true, locked, action })
+  };
+  const server = createApp({ config, actions, apiKey: '' }).listen(0, '127.0.0.1');
+  t.after(() => server.close());
+  await once(server, 'listening');
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const data = await (await fetch(base + '/api/config')).json();
+  assert.equal(data.mode, 'sihosp');
+  assert.deepEqual(data.tools, ['status', 'find', 'read']);
+  assert.equal(data.target.origin, config.target.origin);
+  assert.equal((await (await fetch(base + '/health')).json()).synthetic, false);
+  assert.equal((await (await fetch(base + '/api/agent/status')).json()).synthetic, false);
+  const response = await fetch(base + '/api/lock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.deepEqual(await response.json(), { snapshotExpiresAt: 123456789, expired: false, locked: true, allowClinicalWrites: false });
+});

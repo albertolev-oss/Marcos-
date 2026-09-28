@@ -4,12 +4,15 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { getPage } from './browser.js';
 import { loadConfig } from './config.js';
 import { createActionService } from './actions.js';
-import { dispatchTool } from './agent-tools.js';
+import { createInstitutionalActionService } from './institutional-actions.js';
+import { dispatchTool, toolsForMode } from './agent-tools.js';
 import { createAgentsClient } from './agents-client.js';
 import { runDemo } from './agent-runner.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export function createApp({ config = loadConfig(), actions = createActionService({ config, getPage }), client, apiKey = process.env.OPENAI_API_KEY } = {}) {
+export function createApp({ config = loadConfig(), actions, client, apiKey = process.env.OPENAI_API_KEY } = {}) {
+  const synthetic = !config.mode || config.mode === 'demo';
+  actions ||= synthetic ? createActionService({ config, getPage }) : createInstitutionalActionService({ config });
   const app = express();
   let running;
   const enabled = config.agentsEnabled && Boolean(client || apiKey);
@@ -31,13 +34,16 @@ export function createApp({ config = loadConfig(), actions = createActionService
   app.use(express.static(path.join(root, 'public'), { etag: false, maxAge: 0 }));
   const endpoint = fn => async (req, res) => {
     try { await fn(req, res); }
-    catch (error) { res.status(400).json({ ok: false, error: error.message }); }
+    catch (error) { res.status(400).json({ ok: false, error: error.message, ...(!synthetic ? { locked: actions.isLocked(), recoveryRequired: actions.isLocked() } : {}) }); }
   };
   const emptyBody = req => {
     if (!req.body || Array.isArray(req.body) || Object.keys(req.body).length) throw new Error('Esta operación no acepta parámetros');
   };
-  app.get('/health', (_req, res) => res.json({ ok: true, mode: 'read-only', synthetic: true }));
+  app.get('/health', (_req, res) => res.json({ ok: true, mode: 'read-only', browserMode: config.mode, synthetic }));
   app.get('/api/config', (_req, res) => res.json({
+    mode: config.mode || 'demo',
+    target: config.target,
+    tools: toolsForMode(config.mode).map(tool => tool.name),
     demoOrigin: config.demoOrigin,
     targets: { sihosp: `${config.demoOrigin}/mock-sihosp.html`, pacs: `${config.demoOrigin}/mock-pacs.html` },
     institutionalTargets: { sihosp: 'https://sihosp.fcm.unc.edu.ar', pacs: 'https://pacs.fcm.unc.edu.ar/viewer/index.php' }
@@ -45,8 +51,8 @@ export function createApp({ config = loadConfig(), actions = createActionService
   app.post('/api/lock', endpoint(async (req, res) => {
     emptyBody(req);
     if (running) throw new Error('Hay una prueba en curso');
-    await actions.lock();
-    res.json({ locked: actions.isLocked(), allowClinicalWrites: false });
+    const state = await actions.lock();
+    res.json({ ...state, locked: actions.isLocked(), allowClinicalWrites: false });
   }));
   app.post('/api/unlock', endpoint(async (req, res) => {
     emptyBody(req);
@@ -60,10 +66,10 @@ export function createApp({ config = loadConfig(), actions = createActionService
     if (running && body.action !== 'status') throw new Error('Hay una prueba en curso');
     res.json(await dispatchTool(actions, body.action, Object.hasOwn(body, 'value') ? { value: body.value } : {}));
   }));
-  app.get('/api/agent/status', (_req, res) => res.json({ enabled, busy: Boolean(running), synthetic: true,
-    message: enabled ? 'Agents API: prueba con datos sintéticos' : 'Configure AGENTS_ENABLED y OPENAI_API_KEY en el servidor para ejecutar la prueba remota' }));
+  app.get('/api/agent/status', (_req, res) => res.json({ enabled, busy: Boolean(running), synthetic,
+    message: enabled ? (synthetic ? 'Agents API: prueba con datos sintéticos' : 'Lectura del texto capturado; se envía a OpenAI solo al ejecutar el agente') : 'Configure AGENTS_ENABLED y OPENAI_API_KEY en el servidor para ejecutar el agente' }));
   app.post('/api/agent/run', endpoint(async (req, res) => {
-    emptyBody(req); // Fixed synthetic task; never accept credentials or clinical prompts.
+    emptyBody(req); // Fixed task; never accept credentials or arbitrary prompts.
     if (!enabled) throw new Error('Agents API no está configurada');
     if (running) throw new Error('Hay una prueba en curso');
     running = new AbortController();

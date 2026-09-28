@@ -117,3 +117,136 @@ test('el login manual envía un GET sin credenciales y abre ambos portales sint�
     await new Promise(resolve => server.close(resolve));
   }
 });
+
+for (const mode of ['sihosp', 'pacs']) {
+  test(`perfil ${mode}: solo captura, lectura y búsqueda; limpia resultados y caché`, async () => {
+    const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+    try {
+      const context = await browser.newContext({ serviceWorkers: 'block' });
+      const page = await context.newPage();
+      await page.addInitScript(() => {
+        window.storageEvents = [];
+        Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: {
+          getRegistrations: async () => [{ active: { scriptURL: 'http://ui-demo.test/sw.js' }, unregister: async () => { window.storageEvents.push('unregister'); return true; } }],
+          register: async () => { window.storageEvents.push('register'); }
+        } });
+        Object.defineProperty(window, 'caches', { configurable: true, value: {
+          keys: async () => ['remote-browser-shell-v2', 'unrelated-cache'],
+          delete: async key => { window.storageEvents.push(`delete:${key}`); return true; }
+        } });
+      });
+      let locked = false;
+      let busy = false;
+      let expiresAt = null;
+      let captureTtl = 300_000;
+      let pendingRun;
+      let failRead = false;
+      let failCapture = true;
+      let failUnlock = true;
+      const actionBodies = [];
+      const agentBodies = [];
+      const externalRequests = [];
+      const status = () => ({ locked, snapshotReady: locked && expiresAt !== null && expiresAt > Date.now(), expired: locked && expiresAt !== null && expiresAt <= Date.now(), snapshotExpiresAt: expiresAt });
+      await page.route('**/*', async route => {
+        const url = new URL(route.request().url());
+        if (url.origin !== 'http://ui-demo.test') { externalRequests.push(url.origin); return route.abort(); }
+        const json = (data, code = 200) => route.fulfill({ status: code, contentType: 'application/json', body: JSON.stringify(data) });
+        if (url.pathname === '/api/config') return json({
+          mode,
+          target: { id: mode, label: mode.toUpperCase(), origin: `https://${mode}.fcm.unc.edu.ar`, startUrl: `https://${mode}.fcm.unc.edu.ar/` },
+          tools: ['status', 'find', 'read'],
+          demoOrigin: 'http://127.0.0.1:8081',
+          targets: {}, institutionalTargets: {}
+        });
+        if (url.pathname === '/api/action') {
+          const body = route.request().postDataJSON();
+          actionBodies.push(body);
+          assert.ok(['status', 'find', 'read'].includes(body.action));
+          if (body.action === 'read' && failRead) return json({ error: 'Captura no disponible' }, 409);
+          return json({ ...status(), ...(body.action === 'read' ? { text: 'Registro sintético UI-DEMO-0001' } : body.action === 'find' ? { count: 1 } : {}) });
+        }
+        if (url.pathname === '/api/agent/status') return json({ enabled: true, busy, synthetic: false, mode });
+        if (url.pathname === '/api/lock') {
+          locked = true;
+          if (failCapture) { expiresAt = null; return json({ error: 'Captura incompleta de prueba', locked: true, recoveryRequired: true }, 409); }
+          expiresAt = Date.now() + captureTtl;
+          return json(status());
+        }
+        if (url.pathname === '/api/unlock') {
+          if (failUnlock) return json({ error: 'Reanudación incompleta de prueba', locked: true, recoveryRequired: true }, 409);
+          locked = false; busy = false; expiresAt = null; return json(status());
+        }
+        if (url.pathname === '/api/agent/run') {
+          agentBodies.push(route.request().postDataJSON());
+          busy = true;
+          pendingRun = route;
+          return;
+        }
+        if (url.pathname.startsWith('/novnc/')) return route.fulfill({ contentType: 'text/html', body: '<!doctype html><p>Portal simulado</p>' });
+        const assets = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/styles.css': ['styles.css', 'text/css'], '/manifest.webmanifest': ['manifest.webmanifest', 'application/manifest+json'], '/icon.svg': ['icon.svg', 'image/svg+xml'] };
+        if (assets[url.pathname]) {
+          const [file, contentType] = assets[url.pathname];
+          return route.fulfill({ contentType, body: await readFile(new URL(`../public/${file}`, import.meta.url)) });
+        }
+        return route.fulfill({ status: 404, body: '' });
+      });
+      await page.goto('http://ui-demo.test/');
+      await page.waitForFunction(() => document.getElementById('mode').textContent.includes('Inicio manual'));
+      assert.equal(await page.locator('#lock').textContent(), 'Capturar página para lectura');
+      for (const id of ['demo-targets', 'go', 'url', 'back', 'forward', 'reload', 'institutional-links', 'install']) assert.equal(await page.locator(`#${id}`).isVisible(), false, id);
+      assert.match(await page.locator('#agent-description').textContent(), /se envía a OpenAI/);
+      assert.equal(await page.locator('#pacs-limitation').isVisible(), mode === 'pacs');
+      assert.deepEqual(await page.evaluate(() => window.storageEvents), ['unregister', 'delete:remote-browser-shell-v2']);
+      await page.locator('#lock').click();
+      await page.waitForFunction(() => document.getElementById('mode').textContent === 'CAPTURA NO DISPONIBLE');
+      assert.equal(await page.locator('#desktop-frame').evaluate(frame => frame.inert), true);
+      assert.equal(await page.locator('#read').isDisabled(), true);
+      assert.equal(await page.locator('#agent-run').isDisabled(), true);
+      assert.equal(await page.locator('#lock').isEnabled(), true);
+      await page.locator('#lock').click();
+      await page.waitForFunction(() => document.getElementById('output').textContent.includes('Reanudación incompleta'));
+      assert.equal(await page.locator('#mode').textContent(), 'CAPTURA NO DISPONIBLE');
+      failUnlock = false;
+      await page.locator('#lock').click();
+      await page.waitForFunction(() => document.getElementById('mode').textContent.includes('Inicio manual'));
+      failCapture = false;
+      await page.locator('#lock').click();
+      await page.waitForFunction(() => document.getElementById('mode').textContent === 'TEXTO CAPTURADO');
+      assert.equal(await page.locator('#read').textContent(), 'Leer texto localmente');
+      assert.equal(await page.locator('#agent-run').textContent(), 'Leer página con el agente');
+      failRead = true;
+      await page.locator('#read').click();
+      await page.waitForFunction(() => document.getElementById('output').textContent.includes('capturá la página de nuevo'));
+      failRead = false;
+      await page.locator('#read').click();
+      await page.waitForFunction(() => document.getElementById('output').textContent.includes('UI-DEMO-0001'));
+      assert.deepEqual(agentBodies, []);
+      await page.locator('#query').fill('UI-DEMO-0001');
+      await page.locator('#find').click();
+      await page.waitForFunction(() => document.getElementById('output').textContent.includes('"count": 1'));
+      await page.locator('#agent-run').click();
+      await page.waitForFunction(() => document.getElementById('lock').textContent.startsWith('Detener agente'));
+      await page.locator('#lock').click();
+      await page.waitForFunction(() => document.getElementById('mode').textContent.includes('Inicio manual'));
+      assert.equal(await page.locator('#query').inputValue(), '');
+      assert.doesNotMatch(await page.locator('#output').textContent(), /UI-DEMO-0001/);
+      await pendingRun.fulfill({ contentType: 'application/json', body: JSON.stringify({ text: 'Resultado tardío UI-DEMO-0001' }) });
+      pendingRun = undefined;
+      await page.waitForFunction(() => document.getElementById('agent-status').textContent.includes('Agente disponible'));
+      assert.doesNotMatch(await page.locator('#output').textContent(), /UI-DEMO-0001/);
+      assert.deepEqual(agentBodies, [{}]);
+      captureTtl = 600;
+      await page.locator('#lock').click();
+      await page.waitForFunction(() => document.getElementById('mode').textContent === 'TEXTO CAPTURADO');
+      await page.locator('#read').click();
+      await page.waitForFunction(() => document.getElementById('output').textContent.includes('UI-DEMO-0001'));
+      await page.waitForFunction(() => document.getElementById('mode').textContent === 'CAPTURA VENCIDA');
+      assert.doesNotMatch(await page.locator('#output').textContent(), /UI-DEMO-0001/);
+      assert.equal(await page.locator('#read').isDisabled(), true);
+      assert.equal(await page.locator('#agent-run').isDisabled(), true);
+      assert.ok(actionBodies.some(body => body.action === 'find' && body.value === 'UI-DEMO-0001'));
+      assert.deepEqual(externalRequests, []);
+      await context.close();
+    } finally { await browser.close(); }
+  });
+}

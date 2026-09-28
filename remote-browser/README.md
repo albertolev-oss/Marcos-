@@ -1,5 +1,7 @@
 # Chromium de solo lectura + Agents API (beta)
 
+**Nuevo: SIHOSP/PACS reales después de tu login manual.** Consultá [INSTITUTIONAL.md](INSTITUTIONAL.md) para iniciar los dos escritorios separados y habilitar lectura del texto de la página seleccionada. La sección siguiente describe la demo sintética original.
+
 Prueba sobre Node 22, Express y Playwright del MVP `8e199ef`, integrado en `main` por `73f92e0`. Ejecuta las siete acciones existentes como **function tools de Agents API**. Usa exclusivamente las páginas estáticas SIHOSP/PACS de `tests/fixtures`, con Ana Ejemplo, `DEMO-0001` y estudio `DEMO-EST-0001`. No es una integración clínica validada.
 
 ## Ejecutar la demo desde el iPhone o escritorio
@@ -30,7 +32,7 @@ El botón del agente permanece deshabilitado sin clave/configuración. El login 
 | SIHOSP institucional | Acceso manual externo a `https://sihosp.fcm.unc.edu.ar` |
 | PACS institucional | Acceso manual externo a `https://pacs.fcm.unc.edu.ar/viewer/index.php` |
 
-Los enlaces institucionales abren el navegador del dispositivo, fuera del Chromium controlado por el agente. **No equivalen a conectar Agents API a producción.** Se mantiene el alcance solicitado de datos sintéticos: los dos dominios reales son rechazados como `DEMO_ORIGIN` y como destino de tools. No se leen pacientes, se descargan estudios ni se usa DICOMweb real. Las ramas PACS existentes y sus PR #8/#12 no se mezclan en esta prueba.
+En modo demo, estos enlaces abren el navegador del dispositivo y los dominios reales siguen rechazados como `DEMO_ORIGIN` o destinos de navegación. Para lectura del agente tras el login manual, usá los modos institucionales separados de [INSTITUTIONAL.md](INSTITUTIONAL.md). No se descargan estudios ni se usa DICOMweb real. Las ramas PACS existentes y sus PR #8/#12 no se mezclan en esta prueba.
 
 ## Pruebas sin clave ni llamadas a OpenAI
 

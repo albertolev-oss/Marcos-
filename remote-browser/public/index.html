@@ -3,29 +3,28 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#071a2b"><link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/styles.css"><title>Navegador de solo lectura — Demo sintética</title>
+  <link rel="stylesheet" href="/styles.css"><title>Navegador de solo lectura</title>
 </head>
 <body>
-  <header><div><strong>SIHOSP + PACS · demo sintética</strong><span id="mode">Verificando estado</span></div><button id="install" hidden>Instalar</button></header>
+  <header><div><strong id="header-brand">Navegador de solo lectura</strong><span id="mode">Verificando estado</span></div><button id="install" hidden>Instalar</button></header>
   <main>
-    <section class="notice"><b>Solo datos ficticios.</b> Iniciá sesión manualmente dentro del escritorio con el usuario y la clave ficticios indicados en la demo. No ingreses credenciales institucionales ni datos de pacientes. Después, activá el modo lectura.</section>
-    <section class="targets" aria-label="Portales sintéticos">
-      <div><button id="demo-sihosp" disabled>SIHOSP demo</button><button id="demo-pacs" disabled>PACS demo</button></div>
-      <p>Origen permitido: <code id="demo-origin">Verificando…</code></p>
-    </section>
+    <section class="notice" id="notice-message">Cargando configuración del navegador…</section>
+    <section class="targets" id="demo-targets" aria-label="Portales sintéticos" hidden><div><button id="demo-sihosp" disabled>SIHOSP demo</button><button id="demo-pacs" disabled>PACS demo</button></div></section>
+    <p id="target-info" hidden>Origen permitido: <code id="target-origin"></code></p>
     <section class="controls" aria-label="Acciones de solo lectura">
-      <button id="status" disabled>Estado</button><button id="back" aria-label="Atrás" disabled>←</button><button id="forward" aria-label="Adelante" disabled>→</button><button id="reload" aria-label="Recargar" disabled>↻</button>
-      <input id="url" inputmode="url" aria-label="URL de demostración" placeholder="URL del origen de demostración"><button id="go" disabled>Ir</button>
+      <button id="status" disabled>Estado</button><button id="back" aria-label="Atrás" disabled hidden>←</button><button id="forward" aria-label="Adelante" disabled hidden>→</button><button id="reload" aria-label="Recargar" disabled hidden>↻</button>
+      <input id="url" inputmode="url" aria-label="URL de demostración" placeholder="URL del origen de demostración" hidden><button id="go" disabled hidden>Ir</button>
       <button id="lock" class="primary" disabled>Activar modo lectura</button>
     </section>
     <section class="desktop" id="desktop"><iframe id="desktop-frame" inert tabindex="-1" title="Escritorio Chromium remoto para login manual" src="/novnc/vnc.html?autoconnect=true&amp;resize=scale&amp;path=novnc/websockify"></iframe><div class="shield active" id="shield"><p id="shield-message">Verificando estado del navegador…</p></div></section>
-    <section class="reader"><div><input id="query" aria-label="Texto sintético a buscar" placeholder="Buscar texto ficticio"><button id="find" disabled>Buscar</button><button id="read" disabled>Leer página</button></div></section>
+    <section class="reader"><div><input id="query" aria-label="Texto a buscar" placeholder="Buscar texto" autocomplete="off" disabled><button id="find" disabled>Buscar</button><button id="read" disabled>Leer página</button></div></section>
     <section class="agent-panel" aria-labelledby="agent-title">
-      <h1 id="agent-title">Prueba del agente</h1>
-      <p>Consigna fija: consultar los portales SIHOSP y PACS sintéticos y resumir el registro DEMO-0001. El agente dispone únicamente de status, navigate, back, forward, reload, find y read.</p>
-      <button id="agent-run" class="primary" disabled>Ejecutar prueba sintética</button><p id="agent-status" role="status">Consultando disponibilidad…</p>
+      <h1 id="agent-title">Lectura asistida</h1>
+      <p id="agent-description">Consultando las acciones disponibles…</p>
+      <p id="pacs-limitation" hidden>En PACS se lee solo el texto de la página. No se interpretan imágenes, radiografías ni archivos DICOM.</p>
+      <button id="agent-run" class="primary" disabled>Ejecutar agente</button><p id="agent-status" role="status">Consultando disponibilidad…</p>
     </section>
-    <pre id="output" aria-live="polite">Conectate al escritorio e iniciá sesión con los datos ficticios de la demo. Luego activá el modo lectura.</pre>
-    <aside class="institutional"><strong>Portales institucionales · acceso manual externo</strong><p>Estos enlaces abren el navegador de tu dispositivo. El agente no está conectado a los sistemas reales.</p><a id="institutional-sihosp" target="_blank" rel="noopener noreferrer" hidden>SIHOSP institucional ↗</a><a id="institutional-pacs" target="_blank" rel="noopener noreferrer" hidden>PACS institucional ↗</a></aside>
+    <pre id="output" aria-live="polite">Consultando el estado del navegador…</pre>
+    <aside class="institutional" id="institutional-links" hidden><strong>Portales institucionales · acceso manual externo</strong><p>Estos enlaces abren el navegador de tu dispositivo. En este modo demo el agente no está conectado a los sistemas reales.</p><a id="institutional-sihosp" target="_blank" rel="noopener noreferrer" hidden>SIHOSP institucional ↗</a><a id="institutional-pacs" target="_blank" rel="noopener noreferrer" hidden>PACS institucional ↗</a></aside>
   </main><script src="/app.js"></script>
 </body></html>
